@@ -239,3 +239,6 @@ height: unset;
 padding: 1px 5px 0 5px;
 
 }
+.h6_active{
+    background: #fd6565 !important;
+}
