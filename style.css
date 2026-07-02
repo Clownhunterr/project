@@ -271,3 +271,37 @@ padding: 1px 5px 0 5px;
     top: -17px;
     
 }
+.book .right .chair{
+    width:95%;
+    /* border:1px solid white; */
+    margin: auto;
+
+}
+.book .right .chair .row{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+.book .right .chair .row li{
+    position: relative;
+    width: 20px;
+    height: 15px;
+    background: rgb(184,184,184,.3);
+    list-style: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: .3s linear;
+    font-size: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: 600;
+
+}
+.book .right .chair .row li:hover{
+    background: greenyellow;
+}
