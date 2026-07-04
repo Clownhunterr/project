@@ -262,6 +262,7 @@ padding: 1px 5px 0 5px;
     color: white;
     letter-spacing: 5px;
     font-size: 12px;
+    display: none;
 }
 .book .right .screen::before{
     content: '';
@@ -279,6 +280,7 @@ padding: 1px 5px 0 5px;
     width:95%;
     /* border:1px solid white; */
     margin: auto;
+    display:none;
 
 }
 .book .right .chair .row{
@@ -347,6 +349,7 @@ padding: 1px 5px 0 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+    display: none;
 }
 .book .right .details .details_chair{
     display: flex;
@@ -404,4 +407,61 @@ padding: 1px 5px 0 5px;
     width: 100%;
     height: 100%;
     z-index: -8;
+    display: none;
+}
+
+.book .right .book_ticket{
+    position: absolute;
+   right: 5%;
+   bottom:40px;
+   padding: 8px 9.5px;
+   border-radius: 50%;
+   border:none;
+   outline: none;
+   background: #fd6565;
+   color: white;
+   font-size: 20px;
+   cursor: pointer;
+   transition: .3s linear;
+   display: none;
+}
+.book .right .book_tic:hover{
+    background:black;
+}
+.book .right .ticket{
+    width: 100%;
+    height: 75%;
+    /* border: 1px solid white; */
+    margin-top: 20px;
+    overflow-y: auto;
+}.book .right .ticket::-webkit-scrollbar{
+  display: none;
+}
+.book .right .ticket .tic{
+    width: 100%;
+    height: 215px;
+    display: flex;
+    overflow: hidden;
+    /* border: 1px solid white; */
+}
+.book .right .ticket .tic .barcode , tic_details{
+    width:100%;
+    height: 100%;
+    /* border: 1px solid white; */
+}
+.book .right .ticket .tic .barcode{
+    width:300px;
+    padding: 0 20px;
+    background: white;
+}
+.book .right .ticket .tic .tic_details{
+     width:100%;
+     background: url("img/bg.png")no-repeat center -35px / cover;
+}
+.book .right .ticket .tic .barcode .card{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
 }
