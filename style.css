@@ -341,3 +341,59 @@ padding: 1px 5px 0 5px;
     background: greenyellow !important;
     color:black !important;
 }
+.book .right .details{
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.book .right .details .details_chair{
+    display: flex;
+    align-items: center;
+}
+.book .right .details .details_chair li{
+    position: relative;
+    list-style: none;
+    border-radius: 5px;
+    transition: .3s linear;
+    margin: 0 25px;
+    font-weight: 600;
+    font-size: 12px;
+    color:rgb(184,184,184,.3)
+}
+.book .right .details .details_chair li::before{
+    position: absolute;
+    content: '';
+    width: 20px;
+    height: 15px;
+    background: rgb(184,184,184,.3);
+    border-radius: 5px;
+    left: -30px;
+    transition: .3s linear;
+    top: 2px;
+    
+}
+.book .right .details .details_chair li::after{
+   position: absolute;
+   content: '';
+    width: 20px;
+    height: 4px;
+    background: rgb(184,184,184,.1);
+    border-radius: 10px;
+    left: -30px;
+    bottom: -5px;
+    transition: .3s linear;
+    
+}.book .right .details .details_chair li:nth-child(2)::before{
+    background: #fd6565; 
+}
+.book .right .details .details_chair li:nth-child(2)::before{
+    background: #fd6565;
+}
+.book .right .details .details_chair li:nth-child(3)::before{
+    background: yellowgreen;
+}
+.book .right .details .details_chair li:nth-child(3)::before{
+    background: yellowgreen;
+}
