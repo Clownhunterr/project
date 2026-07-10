@@ -299,7 +299,7 @@ body {
     color: white;
     letter-spacing: 5px;
     font-size: 12px;
-    display: none;
+    /* display: none; */
 }
 
 .book .right .screen::before {
@@ -319,7 +319,7 @@ body {
     width: 95%;
     /* border:1px solid white; */
     margin: auto;
-    display: none;
+    /* display:none; */
 
 }
 
@@ -398,7 +398,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    display: none;
+    /* display: none; */
 }
 
 .book .right .details .details_chair {
@@ -471,18 +471,18 @@ body {
 
 .book .right .book_ticket {
     position: absolute;
-    right: 5%;
-    bottom: 40px;
-    padding: 8px 9.5px;
-    border-radius: 50%;
-    border: none;
-    outline: none;
-    background: #fd6565;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    transition: .3s linear;
-    display: none;
+   right: 5%;
+   bottom:40px;
+   padding: 8px 9.5px;
+   border-radius: 50%;
+   border:none;
+   outline: none;
+   background: #fd6565;
+   color: white;
+   font-size: 20px;
+   cursor: pointer;
+   transition: .3s linear;
+   /* display: none; */
 }
 
 .book .right .book_tic:hover {
@@ -495,10 +495,9 @@ body {
     /* border: 1px solid white; */
     margin-top: 20px;
     overflow-y: auto;
-}
-
-.book .right .ticket::-webkit-scrollbar {
     display: none;
+}.book .right .ticket::-webkit-scrollbar{
+  display: none;
 }
 
 .book .right .ticket .tic {
@@ -508,12 +507,11 @@ body {
     overflow: hidden;
     /* border: 1px solid white; */
 }
-
-.book .right .ticket .tic .barcode,
-tic_details {
-    width: 100%;
+.book .right .ticket .tic .barcode , .tic_details{
+    width:100%;
     height: 100%;
     /* border: 1px solid white; */
+    position:relative;
 }
 
 .book .right .ticket .tic .barcode {
@@ -533,4 +531,75 @@ tic_details {
     align-items: center;
     justify-content: space-between;
     padding: 0 10px;
+}
+.book .right .ticket .tic .barcode .card:nth-child(1){
+  margin-top: 15px;
+}
+.book .right .ticket .tic .barcode .card h6{
+  width: 60%;
+  text-align:left;
+  font-weight: 600;
+}
+.book .right .ticket .tic .barcode .card h6 :nth-child(1){
+  width: 40%;
+}
+.book .right .ticket .tic .barcode  h5{
+  width: 100%;
+  text-align: center;
+}
+.book .right .ticket .tic .tic_details .type{
+  position: absolute;
+  left: 20px;
+  top: 7px;
+  font-weight: 600;
+  color: white;
+}
+.book .right .ticket .tic .tic_details .pvr{
+  position: absolute;
+  right: 20px;
+  top: 7px;
+  font-weight: 600;
+  color: skyblue;
+}
+.book .right .ticket .tic .tic_details .pvr span{
+  color: white;
+}
+.book .right .ticket .tic .tic_details h1{
+  color: white;
+  position: absolute;
+  left: 20px;
+  bottom: 80px;
+}
+.book .right .ticket .tic .tic_details .seat_det{
+  position: absolute;
+  left: 0;
+  bottom: 8px;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(270deg, transparent ,rgb(0,0,0,.3));
+  display: flex;
+  align-items: center;
+  padding-left: 25px; ;
+  
+}
+.book .right .ticket .tic .tic_details .seat_det .seat_cr{
+width: 100px;
+height: 60px;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+color: white;
+}
+.book .right .ticket .tic .tic_details .seat_det .seat_cr h6:nth-child(1){
+    font-size: 11px;
+    font-weight: 600;
+}
+.book .right .ticket .tic .tic_details .seat_det .seat_cr h6:nth-child(2){
+    font-size: 20px;
+    font-weight: 600;
+}
+.book .right .ticket .tic .tic_details .seat_det .seat_cr h6:nth-child(2) sub{
+    font-size: 11px;
+    font-weight: 600;
 }

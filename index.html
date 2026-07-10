@@ -335,8 +335,40 @@
                             <h6> Seat 18</h6>
                             <h6>23:00</h6>
                         </div>
+                        <svg id="barcode"></svg>
+                        <h5>VEGUS CINEMA</h5>
+
+                        
                     </div>
-                    <div class="tic_details"></div>
+                    <div class="tic_details">
+                        <div class="type">4DX</div>
+                        <h5 class="pvr"><span>Vegus</span> Cinema</h5>
+                        <h1>Jawan</h1>
+                        <div class="seat_det">
+                            <div class="seat_cr">
+                            <h6>ROW</h6>
+                            <h6>J</h6>
+                            </div>
+                        </div>
+                        <div class="seat_det">
+                            <div class="seat_cr">
+                            <h6>ROW</h6>
+                            <h6>J</h6>
+                            </div>
+                            <div class="seat_cr">
+                            <h6>SEAT</h6>
+                            <h6>18</h6>
+                            </div>
+                            <div class="seat_cr">
+                            <h6>DATE</h6>
+                            <h6>7<sub>Sep</sub></h6>
+                            </div>
+                            <div class="seat_cr">
+                            <h6>TIME</h6>
+                            <h6>11:30 <sub>pm</sub></h6>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
               </div>
@@ -367,6 +399,11 @@
 
     </div>
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.12.1/JsBarcode.all.js" integrity="sha512-iKSej9nrLjdo6RKseKJcAZgTLj6ESwnUjj/vEFhuDhNTzULrk5RBPWeG2YIVWcI6hAIEccsY9Qf6+g39jpDfnw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        JsBarcode("#barcode", "J1880792023");
+    </script>
     
 </body>
 </html>
