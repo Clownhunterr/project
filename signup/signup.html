@@ -1,0 +1,66 @@
+<!-- <?php
+session_start();
+?> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineBooking | Sign Up</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="signup.css">
+</head>
+<body>
+
+<div class="signup-box">
+
+    <div class="logo">
+        <img src="/img/logo.png" alt="Logo">
+        <h1>CineBooking</h1>
+        <p>Create Your Account</p>
+    </div>
+
+    <form action="signup_process.php" method="POST">
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" name="password" placeholder="Create password" required>
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+        </div>
+
+        <div class="show-password">
+            <input type="checkbox" onclick="togglePassword()">
+            <span>Show Password</span>
+        </div>
+
+        <button type="submit">Sign Up</button>
+
+    </form>
+
+    <div class="login-link">
+        <p>Already have an account?
+            <a href="/login/login.html">Login</a>
+        </p>
+    </div>
+
+</div>
+
+<script src="signup.js"></script>
+
+</body>
+</html>
