@@ -1,47 +1,54 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
-:root{
-    --colour: linear-gradient(0deg,transparent,rgb(184,184,184,.2));
+
+:root {
+    --colour: linear-gradient(0deg, transparent, rgb(184, 184, 184, .2));
 }
-body{
+
+body {
     width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background:#1f2025;
-    font-family: 'poppins',sans-serif;
+    background: #1f2025;
+    font-family: 'poppins', sans-serif;
 }
-.book{
+
+.book {
     width: 92%;
     height: 90%;
     /* border: 1px solid white; */
     display: flex;
 }
-.book .left,.right{
+
+.book .left,
+.right {
     width: 80%;
     position: relative;
     height: 100%;
     /* border: 1px solid white; */
 }
-.book .left{
+
+.book .left {
     width: 20%;
-    background:#2e3037;
+    background: #2e3037;
 }
-.book .left img{
-    width:100%;
+
+.book .left img {
+    width: 100%;
 }
-.book .left .play{
+
+.book .left .play {
     position: relative;
     left: 44%;
     top: -25px;
-    background:#fd6565;
+    background: #fd6565;
     width: 35px;
     height: 35px;
     display: flex;
@@ -49,32 +56,38 @@ body{
     justify-content: center;
     border-radius: 50%;
     color: #fff;
-    box-shadow:  0px 0px 20px #fd6565;
+    box-shadow: 0px 0px 20px #fd6565;
     transition: .3s linear;
     cursor: pointer;
 }
-.book .left .play:hover{
+
+.book .left .play:hover {
     transform: rotate(360deg);
 
 }
-.book .left .cont{
+
+.book .left .cont {
     color: white;
     padding: 0 20px;
 
 }
-.book .left .cont p{
-    font-size:12px;
+
+.book .left .cont p {
+    font-size: 12px;
     margin-bottom: 10px;
 }
-.book .left .cont h6{
+
+.book .left .cont h6 {
     font-size: 13px;
-    
+
 
 }
+
 .book .right {
     padding: 10px 40px;
     background: unset;
 }
+
 .book .right::before {
     position: absolute;
     content: '';
@@ -85,19 +98,21 @@ body{
     z-index: -10;
     border-radius: 20px;
 }
-.book .right::after{
+
+.book .right::after {
     position: absolute;
     content: '';
     width: 95%;
     height: 200px;
     /* border: 1px solid white ; */
-    background: linear-gradient(0deg, transparent ,#1f2025);
+    background: linear-gradient(0deg, transparent, #1f2025);
 
     z-index: -10;
     border-radius: 20px;
 
 }
-.book .right .head_time{
+
+.book .right .head_time {
     position: relative;
     width: 100%;
     display: flex;
@@ -106,50 +121,57 @@ body{
 
 
 }
-.book .right .head_time::before{
-   content: '';
-   position: absolute;
-   width: 150px;
-   height: 250px;
-   top: 0;
-   background: linear-gradient(90deg,transparent,#1f2025);
-   right: -25px;
-   z-index: -9;
+
+.book .right .head_time::before {
+    content: '';
+    position: absolute;
+    width: 150px;
+    height: 250px;
+    top: 0;
+    background: linear-gradient(90deg, transparent, #1f2025);
+    right: -25px;
+    z-index: -9;
 
 
 }
-.book .right .head_time::after{
-   content: '';
-   position: absolute;
-   width: 150px;
-   height: 250px;
-   top: 0;
-   background: linear-gradient(270deg,transparent,#1f2025);
-   left: -25px;
-   z-index: -9;
+
+.book .right .head_time::after {
+    content: '';
+    position: absolute;
+    width: 150px;
+    height: 250px;
+    top: 0;
+    background: linear-gradient(270deg, transparent, #1f2025);
+    left: -25px;
+    z-index: -9;
 
 
 }
-.book .right .head_time h1{
+
+.book .right .head_time h1 {
     color: white;
     font-weight: 600;
 
 }
-.book .right .head_time .time{
+
+.book .right .head_time .time {
     color: #fff;
     display: flex;
     align-items: center;
     font-weight: 600;
 }
-.book .right .head_time .time h6{
+
+.book .right .head_time .time h6 {
     font-weight: 13px;
     margin-right: 15px;
 }
-.book .right .head_time .time i{
+
+.book .right .head_time .time i {
     margin-right: 5px;
 
 }
-.book .right .head_time .time button{
+
+.book .right .head_time .time button {
     padding: 4px 10px;
     border-radius: 10px;
     border: 2px solid #fd6565;
@@ -160,56 +182,66 @@ body{
     transition: .3s linear;
 
 }
-.book .right .head_time .time button:hover{
-   background: #fd6565;
+
+.book .right .head_time .time button:hover {
+    background: #fd6565;
 
 }
-.book .right .date_type{
+
+.book .right .date_type {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
-.book .right .date_type .left_card, .right_card{
+
+.book .right .date_type .left_card,
+.right_card {
     width: 45%;
     /* border: 1px solid white; */
 
 }
-.book .right .date_type::before{
+
+.book .right .date_type::before {
     content: '';
     position: absolute;
     width: 100px;
     height: 190px;
     left: -15px;
     top: 0;
-    background: linear-gradient(180deg, transparent , #1f2025);
+    background: linear-gradient(180deg, transparent, #1f2025);
     z-index: -9;
 }
-.book .right  .title{
+
+.book .right .title {
     color: white;
 
 }
-.book .right  .crd{
+
+.book .right .crd {
     width: 100%;
     overflow-x: auto;
     display: flex;
     align-items: center;
     margin-top: 5px;
-    border-top: 1px solid rgb(184,184,184,.2);
+    border-top: 1px solid rgb(184, 184, 184, .2);
     padding: 5px 0;
-    
+
 }
-.book .right .crd::-webkit-scrollbar{
+
+.book .right .crd::-webkit-scrollbar {
     height: 3px;
-    background: rgb(184,184,184,.2);
-    
+    background: rgb(184, 184, 184, .2);
+
 }
-.book .right .crd::-webkit-scrollbar-thumb{
+
+.book .right .crd::-webkit-scrollbar-thumb {
     height: 3px;
-    background: rgb(184,184,184,.5);
-    
+    background: rgb(184, 184, 184, .5);
+
 }
-.book .right  .crd li{
+
+.book .right .crd li {
     list-style: none;
     color: white;
     min-width: 40px;
@@ -219,7 +251,8 @@ body{
     flex-direction: column;
     cursor: pointer;
 }
-.book .right  .crd li h6:nth-child(2){
+
+.book .right .crd li h6:nth-child(2) {
     background: transparent;
     border-radius: 50%;
     width: 20px;
@@ -232,27 +265,31 @@ body{
     margin-top: 5px;
 
 }
-.book .right  .crd li h6:nth-child(2):hover{
-   background: #fd6565;
+
+.book .right .crd li h6:nth-child(2):hover {
+    background: #fd6565;
 
 }
+
 .book .right .date_type .right_card li h6:nth-child(2) {
-border-radius: 8px;
-width: unset;
-height: unset;
-padding: 1px 5px 0 5px;
+    border-radius: 8px;
+    width: unset;
+    height: unset;
+    padding: 1px 5px 0 5px;
 
 }
+
 /* js active class */
-.h6_active{
+.h6_active {
     background: #fd6565 !important;
 }
+
 /* start screen */
-.screen{
+.screen {
     width: 100%;
-    height:100px;
+    height: 100px;
     border-top: 3px solid #fd6565;
-    position:relative;
+    position: relative;
     margin-top: 50px;
     border-radius: 20px;
     overflow: hidden;
@@ -264,26 +301,29 @@ padding: 1px 5px 0 5px;
     font-size: 12px;
     /* display: none; */
 }
-.book .right .screen::before{
+
+.book .right .screen::before {
     content: '';
     position: absolute;
     width: 100%;
     height: 20px;
     border-radius: 50px;
-    box-shadow: 0px 0px 20px rgb(184,184,184,.15 );
+    box-shadow: 0px 0px 20px rgb(184, 184, 184, .15);
     top: -20px;
     left: 0;
 
-    
+
 }
-.book .right .chair{
-    width:95%;
+
+.book .right .chair {
+    width: 95%;
     /* border:1px solid white; */
     margin: auto;
     /* display:none; */
 
 }
-.book .right .chair .row{
+
+.book .right .chair .row {
     width: 100%;
     display: flex;
     align-items: center;
@@ -291,11 +331,12 @@ padding: 1px 5px 0 5px;
     margin-top: 10px;
     margin-bottom: 15px;
 }
-.book .right .chair .row li{
+
+.book .right .chair .row li {
     position: relative;
     width: 20px;
     height: 15px;
-    background: rgb(184,184,184,.3);
+    background: rgb(184, 184, 184, .3);
     list-style: none;
     border-radius: 3px;
     cursor: pointer;
@@ -308,42 +349,50 @@ padding: 1px 5px 0 5px;
     font-weight: 600;
 
 }
-.book .right .chair .row li:hover{
+
+.book .right .chair .row li:hover {
     background: greenyellow;
-    color:black;
+    color: black;
 }
-.book .right .chair .row li:before{
+
+.book .right .chair .row li:before {
     content: '';
     position: absolute;
     width: 100%;
-    height:5px;
-    background: rgb(184,184,184,.1);
+    height: 5px;
+    background: rgb(184, 184, 184, .1);
     bottom: -8px;
     border-radius: 10px;
 }
-.book .right .chair .row li:nth-child(6){
+
+.book .right .chair .row li:nth-child(6) {
     margin-right: 20px;
 
 }
-.book .right .chair .row li:nth-last-child(6){
+
+.book .right .chair .row li:nth-last-child(6) {
     margin-left: 20px;
-    
+
 }
-.book .right .chair .row span{
+
+.book .right .chair .row span {
     color: white;
     font-size: 10px;
     font-weight: 600;
 }
+
 /* javascript class colours */
-.book .right .chair .booked{
+.book .right .chair .booked {
     background: red !important;
 
 }
-.book .right .chair .selected{
+
+.book .right .chair .selected {
     background: greenyellow !important;
-    color:black !important;
+    color: black !important;
 }
-.book .right .details{
+
+.book .right .details {
     width: 100%;
     margin-top: 40px;
     display: flex;
@@ -351,11 +400,13 @@ padding: 1px 5px 0 5px;
     justify-content: center;
     /* display: none; */
 }
-.book .right .details .details_chair{
+
+.book .right .details .details_chair {
     display: flex;
     align-items: center;
 }
-.book .right .details .details_chair li{
+
+.book .right .details .details_chair li {
     position: relative;
     list-style: none;
     border-radius: 5px;
@@ -363,44 +414,52 @@ padding: 1px 5px 0 5px;
     margin: 0 25px;
     font-weight: 600;
     font-size: 12px;
-    color:rgb(184,184,184,.3)
+    color: rgb(184, 184, 184, .3)
 }
-.book .right .details .details_chair li::before{
+
+.book .right .details .details_chair li::before {
     position: absolute;
     content: '';
     width: 20px;
     height: 15px;
-    background: rgb(184,184,184,.3);
+    background: rgb(184, 184, 184, .3);
     border-radius: 5px;
     left: -30px;
     transition: .3s linear;
     top: 2px;
-    
+
 }
-.book .right .details .details_chair li::after{
-   position: absolute;
-   content: '';
+
+.book .right .details .details_chair li::after {
+    position: absolute;
+    content: '';
     width: 20px;
     height: 4px;
-    background: rgb(184,184,184,.1);
+    background: rgb(184, 184, 184, .1);
     border-radius: 10px;
     left: -30px;
     bottom: -5px;
     transition: .3s linear;
-    
-}.book .right .details .details_chair li:nth-child(2)::before{
-    background: #fd6565; 
+
 }
-.book .right .details .details_chair li:nth-child(2)::before{
+
+.book .right .details .details_chair li:nth-child(2)::before {
     background: #fd6565;
 }
-.book .right .details .details_chair li:nth-child(3)::before{
+
+.book .right .details .details_chair li:nth-child(2)::before {
+    background: #fd6565;
+}
+
+.book .right .details .details_chair li:nth-child(3)::before {
     background: yellowgreen;
 }
-.book .right .details .details_chair li:nth-child(3)::before{
+
+.book .right .details .details_chair li:nth-child(3)::before {
     background: yellowgreen;
 }
-.book .right video{
+
+.book .right video {
     position: absolute;
     left: 0;
     top: 0;
@@ -410,7 +469,7 @@ padding: 1px 5px 0 5px;
     /* display: none; */
 }
 
-.book .right .book_ticket{
+.book .right .book_ticket {
     position: absolute;
    right: 5%;
    bottom:40px;
@@ -425,10 +484,12 @@ padding: 1px 5px 0 5px;
    transition: .3s linear;
    /* display: none; */
 }
-.book .right .book_tic:hover{
-    background:black;
+
+.book .right .book_tic:hover {
+    background: black;
 }
-.book .right .ticket{
+
+.book .right .ticket {
     width: 100%;
     height: 75%;
     /* border: 1px solid white; */
@@ -438,7 +499,8 @@ padding: 1px 5px 0 5px;
 }.book .right .ticket::-webkit-scrollbar{
   display: none;
 }
-.book .right .ticket .tic{
+
+.book .right .ticket .tic {
     width: 100%;
     height: 215px;
     display: flex;
@@ -451,21 +513,24 @@ padding: 1px 5px 0 5px;
     /* border: 1px solid white; */
     position:relative;
 }
-.book .right .ticket .tic .barcode{
-    width:300px;
+
+.book .right .ticket .tic .barcode {
+    width: 300px;
     padding: 0 20px;
     background: white;
 }
-.book .right .ticket .tic .tic_details{
-     width:100%;
-     background: url("img/bg.png")no-repeat center -35px / cover;
+
+.book .right .ticket .tic .tic_details {
+    width: 100%;
+    background: url("img/bg.png")no-repeat center -35px / cover;
 }
-.book .right .ticket .tic .barcode .card{
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
+
+.book .right .ticket .tic .barcode .card {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
 }
 .book .right .ticket .tic .barcode .card:nth-child(1){
   margin-top: 15px;
