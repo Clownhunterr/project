@@ -1,4 +1,8 @@
-CREATE TABLE users (
+CREATE DATABASE IF NOT EXISTS movie_booking;
+
+USE movie_booking;
+
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
