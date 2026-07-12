@@ -24,13 +24,13 @@ body::before{
 .login-box{
     position:relative;
     width:400px;
-    background:rgba(25,25,25,.85);
+    background:rgba(10,10,10,.40);
     backdrop-filter:blur(10px);
     border-radius:20px;
     padding:40px;
     color:#fff;
     z-index:1;
-    box-shadow:0 15px 40px rgba(0,0,0,.5);
+    box-shadow:0 15px 40px rgba(0,0,0,.3);
 }
 
 .logo{
@@ -102,7 +102,7 @@ body::before{
 button{
     width:100%;
     padding:15px;
-    background:#E50914;
+    background:yellowgreen;
     color:white;
     border:none;
     border-radius:10px;
@@ -112,7 +112,7 @@ button{
 }
 
 button:hover{
-    background:#b20710;
+    background:green;
 }
 
 .signup{

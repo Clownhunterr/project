@@ -24,7 +24,7 @@ body::before{
 .signup-box{
     position:relative;
     width:430px;
-    background:rgba(20,20,20,.88);
+    background:rgba(10,10,10,.40);
     backdrop-filter:blur(12px);
     border-radius:20px;
     padding:35px;
@@ -89,7 +89,7 @@ button{
     padding:15px;
     border:none;
     border-radius:10px;
-    background:#E50914;
+    background:yellowgreen;
     color:white;
     font-size:16px;
     cursor:pointer;
@@ -97,7 +97,7 @@ button{
 }
 
 button:hover{
-    background:#b20710;
+    background:green;
 }
 
 .login-link{
