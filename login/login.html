@@ -9,6 +9,7 @@ if(isset($_SESSION['user_id'])){
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,60 +18,71 @@ if(isset($_SESSION['user_id'])){
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="login-box">
+    <div class="login-box">
 
-    <div class="logo">
-        <img src="/img/logo.png" alt="Logo">
-        <h1>CineBooking</h1>
-        <p>Book Movies Anytime, Anywhere</p>
-    </div>
-
-    <form action="login_process.php" method="POST">
-
-        <div class="input-group">
-            <label>Email</label>
-            <input type="email" name="email" placeholder="Enter your email" required>
+        <div class="logo">
+            <img src="/img/logo.png" alt="Logo">
+            <h1>CineBooking</h1>
+            <p>Book Movies Anytime, Anywhere</p>
         </div>
 
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <form action="../auth/login.php" method="POST">
 
-            <div class="show-password">
-                <input type="checkbox" onclick="showPassword()">
-                <span>Show Password</span>
+            <div class="input-group">
+                <label>Username or Email</label>
+                <input type="text" name="identifier" placeholder="Enter your username or email" required>
             </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+                <div class="show-password">
+                    <input type="checkbox" onclick="showPassword()">
+                    <span>Show Password</span>
+                </div>
+            </div>
+
+            <div class="options">
+
+                <label>
+                    <input type="checkbox">
+                    Remember Me
+                </label>
+
+                <a href="#">Forgot Password?</a>
+
+            </div>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+
+        <div class="demo-credentials">
+            <p><strong>Testing credentials</strong></p>
+            <p>Username: <code>demo</code> (or Email: <code>demo@cinebooking.com</code>)</p>
+            <p>Password: <code>demo123</code></p>
         </div>
 
-        <div class="options">
 
-            <label>
-                <input type="checkbox">
-                Remember Me
-            </label>
-
-            <a href="#">Forgot Password?</a>
-
+        <div class="signup">
+            Don't have an account?
+            <a href="/signup/signup.html">Sign Up</a>
         </div>
 
-        <button type="submit">Login</button>
-
-    </form>
-
-    <div class="signup">
-        Don't have an account?
-        <a href="/signup/signup.html">Sign Up</a>
     </div>
 
-</div>
-
-<script src="js/login.js"></script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>

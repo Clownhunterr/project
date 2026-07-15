@@ -1,4 +1,12 @@
 <?php
+/*
+ * ARCHIVED: This was the placeholder homepage that used to load at the site
+ * root before the real homepage (now home.php) was pointed to correctly.
+ * It's kept here for reference only - it is not linked from anywhere in the
+ * live site anymore. Safe to delete once you've confirmed you don't need it.
+ * (Its own links - login.php, register.php, logout.php - refer to the old
+ * root file locations and would need updating if you ever revive this page.)
+ */
 session_start(); // must be first line
 
 $isLoggedIn = isset($_SESSION['user_id']);

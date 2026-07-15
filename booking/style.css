@@ -94,7 +94,7 @@ body {
     width: 95%;
     height: 250px;
     /* border: 1px solid white ; */
-    background: url(img/bg.png)no-repeat center -30px/cover;
+    background: url(../img/bg.png)no-repeat center -30px/cover;
     z-index: -10;
     border-radius: 20px;
 }
@@ -522,7 +522,7 @@ body {
 
 .book .right .ticket .tic .tic_details {
     width: 100%;
-    background: url("img/bg.png")no-repeat center -35px / cover;
+    background: url("../img/bg.png")no-repeat center -35px / cover;
 }
 
 .book .right .ticket .tic .barcode .card {

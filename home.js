@@ -1,21 +1,17 @@
-let currentTrailer = "video/Gadar2 Official Trailer - 11th August - Sunny Deol - Ameesha Patel - Anil Sharma - Zee Studios.mp4";
+let currentTrailer = "REPLACE_WITH_YOUTUBE_ID_SPIDERMAN";
 
 function openTrailer() {
-    const trailer = document.querySelector('.trailer');
-    const video = document.getElementById('trailerVideo');
-    video.src = currentTrailer;
-    trailer.classList.add('active');
-    video.play();
+    const overlay = document.getElementById('trailerOverlay');
+    const iframe = document.getElementById('trailerVideo');
+    iframe.src = `https://www.youtube.com/embed/${currentTrailer}?autoplay=1&mute=1&rel=0&modestbranding=1`;
+    overlay.classList.add('active');
 }
 
 function closeTrailer() {
-    const trailer = document.querySelector('.trailer');
-    const video = document.getElementById('trailerVideo');
-    video.pause();
-    video.currentTime = 0;
-    video.removeAttribute('src');
-    video.load();
-    trailer.classList.remove('active');
+    const overlay = document.getElementById('trailerOverlay');
+    const iframe = document.getElementById('trailerVideo');
+    iframe.src = "";
+    overlay.classList.remove('active');
 }
 
 function updateMovie(item) {
@@ -50,7 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    $('.carousel').carousel('set', 2);
+    if (carouselItems.length > 0) {
+        updateMovie(carouselItems[0]);
+    }
 
     const carouselBox = document.getElementById('carouselBox');
     let scrollTimeout;
@@ -64,5 +62,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('.carousel').carousel('prev');
             }
         }, 50);
+    });
+
+    const trailerOverlay = document.getElementById('trailerOverlay');
+    trailerOverlay.addEventListener('click', function (e) {
+        if (e.target === trailerOverlay) {
+            closeTrailer();
+        }
     });
 });

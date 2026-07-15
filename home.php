@@ -1,3 +1,7 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,25 +17,29 @@
 
 <body>
     <header>
-        <a href="#" class="logo">CineBooking</a>
-        <ul class="nav">
-            <li>
-                <a href="#"><i class="fa-solid fa-house" aria-hidden="true"></i></a>
-            </li>
-            <li><a href="#">Adults</a></li>
-            <li><a href="#">Kids</a></li>
-            <li><a href="#">Trend</a></li>
-            <li><a href="#">My List</a></li>
-        </ul>
+        <a href="home.php" class="logo">CineBooking</a>
+
         <div class="search">
             <input type="text" placeholder="Search" />
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         </div>
+
+        <?php if ($isLoggedIn): ?>
+            <a href="/profile/profile.php" class="profile-btn">
+                <i class="fa-solid fa-circle-user"></i>
+                <?php echo htmlspecialchars($_SESSION['name']); ?>
+            </a>
+        <?php else: ?>
+            <a href="/login/login.html" class="auth-btn">Login / Register</a>
+        <?php endif; ?>
     </header>
 
-    <div class="trailer">
-        <video id="trailerVideo" muted controls></video>
-        <img src="img/close.png" alt="" class="close" onclick="closeTrailer();">
+    <div class="trailer" id="trailerOverlay">
+        <div class="video-wrapper">
+            <iframe id="trailerVideo" src="" title="Movie Trailer" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
     </div>
 
     <div class="banner" id="banner">
@@ -48,10 +56,9 @@
                 dangerous foes from other worlds start to appear.
             </p>
             <div class="button">
-                <a href="javascript:void(0)" class="playTrailerBtn" onclick="openTrailer()"><i class="fa-solid fa-play"
+                <a href="javascript:void(0)" onclick="openTrailer()"><i class="fa-solid fa-play"
                         aria-hidden="true"></i>Watch Trailer</a>
-                <a href="index.html" class="bookTicketBtn"><i class="fa-solid fa-plus" aria-hidden="true"></i>Book
-                    Ticket</a>
+                <a href="/booking/booking.html"><i class="fa-solid fa-plus" aria-hidden="true"></i>Book Ticket</a>
             </div>
         </div>
 
@@ -62,44 +69,38 @@
                     data-title-img="img/NWHPLogoPoster.jpg" data-year="2022" data-rating="12+" data-duration="2h 14min"
                     data-genre="Romance"
                     data-desc="With Spider-Man's identity now revealed, Peter asks Doctor Strange for help. When a spell goes wrong, dangerous foes from other worlds start to appear."
-                    data-trailer="video/Gadar2 Official Trailer - 11th August - Sunny Deol - Ameesha Patel - Anil Sharma - Zee Studios.mp4">
+                    data-trailer="REPLACE_WITH_YOUTUBE_ID_SPIDERMAN">
                     <img src="img/spiderman.jpg" alt="Spider-Man" />
                 </div>
 
                 <div class="carousel-item" data-bg="img/johnWickfromTMBD.jpg" data-title-img="img/Jhon Wick.jpg"
                     data-year="2023" data-rating="15+" data-duration="2h 9min" data-genre="Action"
                     data-desc="John Wick uncovers a path to defeating The High Table, but before he can earn his freedom, he must face off against a new enemy."
-                    data-trailer="video/Jawan Official Trailer-(1).mp4">
+                    data-trailer="REPLACE_WITH_YOUTUBE_ID_JOHNWICK">
                     <img src="img/Jhon Wick.jpg" alt="John Wick" />
                 </div>
-
 
                 <div class="carousel-item" data-bg="img/UTRHfromTMD.jpg" data-title-img="img/UTRHLogoPoster.jpg"
                     data-year="2023" data-rating="12+" data-duration="2h 5min" data-genre="Sci-Fi"
                     data-desc="There's a mystery afoot in Gotham City, and Batman must go toe-to-toe with a mysterious vigilante, who goes by the name of Red Hood. Subsequently, old wounds reopen and old, once buried memories come into the light"
-                    data-trailer="video/Gadar2 Official Trailer - 11th August - Sunny Deol - Ameesha Patel - Anil Sharma - Zee Studios.mp4">
+                    data-trailer="REPLACE_WITH_YOUTUBE_ID_REDHOOD">
                     <img src="img/5GZRRD4Q9kQhyveYU3CFw27sQxi.jpg" alt="Ant Man" />
                 </div>
-
-
-
 
                 <div class="carousel-item" data-bg="img/the-avengers-in-the-avengers-2012.jpg"
                     data-title-img="img/AvengersfromTMDB.jpg" data-year="2019" data-rating="12+" data-duration="3h 1min"
                     data-genre="Action"
                     data-desc="The remaining Avengers must find a way to bring back their fallen allies for one final, epic battle."
-                    data-trailer="video/Gadar2 Official Trailer - 11th August - Sunny Deol - Ameesha Patel - Anil Sharma - Zee Studios.mp4">
+                    data-trailer="REPLACE_WITH_YOUTUBE_ID_AVENGERS">
                     <img src="img/avengers.jpg" alt="Avengers" />
                 </div>
-
 
                 <div class="carousel-item" data-bg="img/MoonKnightfromTMD.jpg" data-title-img="img/MoonKnightPoster.jpg"
                     data-year="2022" data-rating="15+" data-duration="6 episodes" data-genre="Fantasy"
                     data-desc="A man with dissociative identity disorder becomes entangled in a deadly mystery involving Egyptian gods."
-                    data-trailer="video/Jawan Official Trailer-(1).mp4">
+                    data-trailer="REPLACE_WITH_YOUTUBE_ID_MOONKNIGHT">
                     <img src="img/moon knight.jpg" alt="Moon Knight" />
                 </div>
-
 
             </div>
         </div>
@@ -118,10 +119,10 @@
                 </div>
             </div>
             <div class="movie-card">
-                <img src="img/topgun.jpg" alt="Top Gun" />
+                <img src="img/thor love of thunder.jpg" alt="Thor: Love and Thunder" />
                 <div class="movie-info">
-                    <h3>Top Gun</h3>
-                    <p>Action • 2h 10min</p>
+                    <h3>Thor: Love and Thunder</h3>
+                    <p>Action • 1h 59min</p>
                     <a href="#" class="btn-book">Book Ticket</a>
                 </div>
             </div>
@@ -215,7 +216,7 @@
                 <ul>
                     <li><a href="#">Now Showing</a></li>
                     <li><a href="#">Coming Soon</a></li>
-                    <li><a href="#">My Bookings</a></li>
+                    <li><a href="/profile/profile.php">My Bookings</a></li>
                     <li><a href="#">Contact</a></li>
                 </ul>
             </div>
