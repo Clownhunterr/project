@@ -1,34 +1,80 @@
-let currentTrailer = "REPLACE_WITH_YOUTUBE_ID_SPIDERMAN";
+let currentTrailer = "";
 
 function openTrailer() {
+    if (!currentTrailer) return;
     const overlay = document.getElementById('trailerOverlay');
-    const iframe = document.getElementById('trailerVideo');
-    iframe.src = `https://www.youtube.com/embed/${currentTrailer}?autoplay=1&mute=1&rel=0&modestbranding=1`;
+    const video = document.getElementById('trailerVideo');
+    video.src = currentTrailer;
     overlay.classList.add('active');
+    video.play();
 }
 
 function closeTrailer() {
     const overlay = document.getElementById('trailerOverlay');
-    const iframe = document.getElementById('trailerVideo');
-    iframe.src = "";
+    const video = document.getElementById('trailerVideo');
+    video.pause();
+    video.currentTime = 0;
+    video.removeAttribute('src');
+    video.load();
     overlay.classList.remove('active');
 }
 
 function updateMovie(item) {
+    if (!item || !item.dataset) return;
+
     const banner = document.getElementById('banner');
+    if (banner) {
+        banner.style.backgroundImage = `url("${item.dataset.bg}")`;
+        banner.style.backgroundSize = 'cover';
+        banner.style.backgroundPosition = 'center';
+    }
 
-    banner.style.backgroundImage = `url("${item.dataset.bg}")`;
-    banner.style.backgroundSize = 'cover';
-    banner.style.backgroundPosition = 'center';
+    const titleImg = document.getElementById('movieTitleImg');
+    const yearEl = document.getElementById('movieYear');
+    const ratingEl = document.getElementById('movieRating');
+    const durationEl = document.getElementById('movieDuration');
+    const genreEl = document.getElementById('movieGenre');
+    const descEl = document.getElementById('movieDesc');
 
-    document.getElementById('movieTitleImg').src = item.dataset.titleImg;
-    document.getElementById('movieYear').textContent = item.dataset.year;
-    document.getElementById('movieRating').textContent = item.dataset.rating;
-    document.getElementById('movieDuration').textContent = item.dataset.duration;
-    document.getElementById('movieGenre').textContent = item.dataset.genre;
-    document.getElementById('movieDesc').textContent = item.dataset.desc;
+    if (titleImg) titleImg.src = item.dataset.titleImg;
+    if (yearEl) yearEl.textContent = item.dataset.year;
+    if (ratingEl) ratingEl.textContent = item.dataset.rating;
+    if (durationEl) durationEl.textContent = item.dataset.duration;
+    if (genreEl) genreEl.textContent = item.dataset.genre;
+    if (descEl) descEl.textContent = item.dataset.desc;
 
-    currentTrailer = item.dataset.trailer;
+    currentTrailer = item.dataset.trailer || "";
+}
+
+function toggleWishlist(button) {
+    if (typeof CINEBOOKING_LOGGED_IN !== 'undefined' && !CINEBOOKING_LOGGED_IN) {
+        window.location.href = '/login/login.html';
+        return;
+    }
+
+    const movieId = button.dataset.movieId;
+    const icon = button.querySelector('i');
+
+    fetch('wishlist_toggle.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `movie_id=${encodeURIComponent(movieId)}`
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                if (data.message) alert(data.message);
+                return;
+            }
+            button.classList.toggle('active', data.inWishlist);
+            icon.classList.toggle('fa-solid', data.inWishlist);
+            icon.classList.toggle('fa-regular', !data.inWishlist);
+            button.classList.add('pulse');
+            setTimeout(() => button.classList.remove('pulse'), 300);
+        })
+        .catch(() => {
+            alert('Something went wrong updating your wishlist. Please try again.');
+        });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -40,34 +86,54 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    $('.carousel').carousel({
-        onCycleTo: function (item) {
-            updateMovie(item[0]);
-        }
-    });
+    if (carouselItems.length > 0 && typeof $ !== 'undefined' && $.fn.carousel) {
+        $('.carousel').carousel({
+            onCycleTo: function (item) {
+                const element = item instanceof HTMLElement ? item : item[0];
+                updateMovie(element);
+            }
+        });
 
-    if (carouselItems.length > 0) {
         updateMovie(carouselItems[0]);
+
+        const carouselBox = document.getElementById('carouselBox');
+        if (carouselBox) {
+            let scrollTimeout;
+            carouselBox.addEventListener('wheel', function (e) {
+                e.preventDefault();
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (e.deltaY > 0) {
+                        $('.carousel').carousel('next');
+                    } else {
+                        $('.carousel').carousel('prev');
+                    }
+                }, 50);
+            });
+        }
     }
 
-    const carouselBox = document.getElementById('carouselBox');
-    let scrollTimeout;
-    carouselBox.addEventListener('wheel', function (e) {
-        e.preventDefault();
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            if (e.deltaY > 0) {
-                $('.carousel').carousel('next');
-            } else {
-                $('.carousel').carousel('prev');
-            }
-        }, 50);
-    });
-
+    // Click on the dark backdrop (anywhere outside the video itself) closes the trailer.
+    // stopPropagation on the wrapper is a second safety net so clicks on the video
+    // controls/letterboxing never bubble up and accidentally trigger a close.
     const trailerOverlay = document.getElementById('trailerOverlay');
-    trailerOverlay.addEventListener('click', function (e) {
-        if (e.target === trailerOverlay) {
+    const videoWrapper = document.querySelector('.video-wrapper');
+
+    if (videoWrapper) {
+        videoWrapper.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    }
+
+    if (trailerOverlay) {
+        trailerOverlay.addEventListener('click', function () {
             closeTrailer();
-        }
-    });
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && trailerOverlay.classList.contains('active')) {
+                closeTrailer();
+            }
+        });
+    }
 });

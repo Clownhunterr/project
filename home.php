@@ -1,6 +1,59 @@
 <?php
 session_start();
+require 'database/db.php';
+require 'includes/movie_functions.php';
+
 $isLoggedIn = isset($_SESSION['user_id']);
+$wishlistIds = $isLoggedIn ? getUserWishlistIds($pdo, $_SESSION['user_id']) : [];
+
+$searchQuery = trim($_GET['search'] ?? '');
+$searchResults = [];
+if ($searchQuery !== '') {
+    $searchResults = searchMovies($pdo, $searchQuery);
+}
+
+$carouselMovies = getCarouselMovies($pdo, 5);
+$nowShowing = getNowShowing($pdo, 8);
+$comingSoon = getComingSoon($pdo, 8);
+$popularMovies = getPopularMovies($pdo, 4);
+
+function formatDuration($minutes)
+{
+    $minutes = (int) $minutes;
+    if ($minutes <= 0)
+        return '';
+    $h = intdiv($minutes, 60);
+    $m = $minutes % 60;
+    if ($h > 0 && $m > 0)
+        return "{$h}h {$m}min";
+    if ($h > 0)
+        return "{$h}h";
+    return "{$m}min";
+}
+
+function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticket')
+{
+    $isFallback = !empty($movie['is_fallback']);
+    $inWishlist = !$isFallback && in_array($movie['movie_id'], $wishlistIds);
+    $poster = $movie['poster_url'] ?: 'img/placeholder-poster.jpg';
+    ?>
+    <div class="movie-card">
+        <?php if ($isLoggedIn && !$isFallback): ?>
+            <button class="heart-btn <?php echo $inWishlist ? 'active' : ''; ?>"
+                data-movie-id="<?php echo (int) $movie['movie_id']; ?>" onclick="toggleWishlist(this)" title="Add to wishlist">
+                <i class="<?php echo $inWishlist ? 'fa-solid' : 'fa-regular'; ?> fa-heart"></i>
+            </button>
+        <?php endif; ?>
+        <img src="<?php echo htmlspecialchars($poster); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>" />
+        <div class="movie-info">
+            <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
+            <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
+            </p>
+            <a href="#" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
+        </div>
+    </div>
+    <?php
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,13 +72,15 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <header>
         <a href="home.php" class="logo">CineBooking</a>
 
-        <div class="search">
-            <input type="text" placeholder="Search" />
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        </div>
+        <form class="search" method="GET" action="home.php">
+            <input type="text" name="search" placeholder="Search movies, genres..."
+                value="<?php echo htmlspecialchars($searchQuery); ?>" />
+            <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"
+                    aria-hidden="true"></i></button>
+        </form>
 
         <?php if ($isLoggedIn): ?>
-            <a href="/profile/profile.php" class="profile-btn">
+            <a href="profile/profile.php" , class="profile-btn">
                 <i class="fa-solid fa-circle-user"></i>
                 <?php echo htmlspecialchars($_SESSION['name']); ?>
             </a>
@@ -36,173 +91,129 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
     <div class="trailer" id="trailerOverlay">
         <div class="video-wrapper">
-            <iframe id="trailerVideo" src="" title="Movie Trailer" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
+            <video id="trailerVideo" controls></video>
         </div>
     </div>
 
-    <div class="banner" id="banner">
-        <div class="content active" id="movieContent">
-            <img src="img/NWHPLogoPoster.jpg" alt="" class="movie-title" id="movieTitleImg">
-            <h4>
-                <span id="movieYear">2022</span>
-                <span><i id="movieRating">12+</i></span>
-                <span id="movieDuration">2h 14min</span>
-                <span id="movieGenre">Romance</span>
-            </h4>
-            <p id="movieDesc">
-                With Spider-Man's identity now revealed, Peter asks Doctor Strange for help. When a spell goes wrong,
-                dangerous foes from other worlds start to appear.
-            </p>
-            <div class="button">
-                <a href="javascript:void(0)" onclick="openTrailer()"><i class="fa-solid fa-play"
-                        aria-hidden="true"></i>Watch Trailer</a>
-                <a href="/booking/booking.html"><i class="fa-solid fa-plus" aria-hidden="true"></i>Book Ticket</a>
-            </div>
+    <?php if ($searchQuery !== ''): ?>
+
+        <!-- SEARCH RESULTS -->
+        <section class="movie-section search-section">
+            <h2 class="section-title">Search Results for "<?php echo htmlspecialchars($searchQuery); ?>"</h2>
+            <?php if (count($searchResults) === 0): ?>
+                <div class="empty-state">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <p>No movies matched your search.</p>
+                    <a href="home.php" class="btn-primary">Back to Home</a>
+                </div>
+            <?php else: ?>
+                <div class="movie-grid">
+                    <?php foreach ($searchResults as $movie): ?>
+                        <?php movieCard($movie, $wishlistIds, $isLoggedIn); ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+    <?php else: ?>
+
+        <div class="banner" id="banner">
+            <?php if (count($carouselMovies) > 0):
+                $first = $carouselMovies[0];
+                $firstTitleImg = $first['title_img'] ?? $first['poster_url'];
+                ?>
+                <div class="content active" id="movieContent">
+                    <img src="<?php echo htmlspecialchars($firstTitleImg ?: 'img/placeholder-poster.jpg'); ?>" alt=""
+                        class="movie-title" id="movieTitleImg">
+                    <h4>
+                        <span
+                            id="movieYear"><?php echo $first['release_date'] ? date('Y', strtotime($first['release_date'])) : ''; ?></span>
+                        <span><i id="movieRating"><?php echo htmlspecialchars($first['age_rating']); ?></i></span>
+                        <span id="movieDuration"><?php echo formatDuration($first['duration_minutes']); ?></span>
+                        <span id="movieGenre"><?php echo htmlspecialchars($first['genre']); ?></span>
+                    </h4>
+                    <p id="movieDesc"><?php echo htmlspecialchars($first['description']); ?></p>
+                    <div class="button">
+                        <a href="javascript:void(0)" onclick="openTrailer()"><i class="fa-solid fa-play"
+                                aria-hidden="true"></i>Watch Trailer</a>
+                        <a href="#"><i class="fa-solid fa-plus" aria-hidden="true"></i>Book Ticket</a>
+                    </div>
+                </div>
+
+                <div class="carousel-box" id="carouselBox">
+                    <div class="carousel">
+                        <?php foreach ($carouselMovies as $movie):
+                            $titleImg = $movie['title_img'] ?? $movie['poster_url'];
+                            ?>
+                            <div class="carousel-item"
+                                data-bg="<?php echo htmlspecialchars($movie['backdrop_url'] ?: $movie['poster_url']); ?>"
+                                data-title-img="<?php echo htmlspecialchars($titleImg); ?>"
+                                data-year="<?php echo $movie['release_date'] ? date('Y', strtotime($movie['release_date'])) : ''; ?>"
+                                data-rating="<?php echo htmlspecialchars($movie['age_rating']); ?>"
+                                data-duration="<?php echo formatDuration($movie['duration_minutes']); ?>"
+                                data-genre="<?php echo htmlspecialchars($movie['genre']); ?>"
+                                data-desc="<?php echo htmlspecialchars($movie['description']); ?>"
+                                data-trailer="<?php echo htmlspecialchars($movie['trailer_url']); ?>">
+                                <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
+                                    alt="<?php echo htmlspecialchars($movie['title']); ?>" />
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
-        <div class="carousel-box" id="carouselBox">
-            <div class="carousel">
+        <!-- NOW SHOWING -->
+        <section class="movie-section">
+            <h2 class="section-title">Now Showing</h2>
+            <div class="movie-grid">
+                <?php foreach ($nowShowing as $movie): ?>
+                    <?php movieCard($movie, $wishlistIds, $isLoggedIn); ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
 
-                <div class="carousel-item" id="spidermanItem" data-bg="img/NWHfromTMD.jpg"
-                    data-title-img="img/NWHPLogoPoster.jpg" data-year="2022" data-rating="12+" data-duration="2h 14min"
-                    data-genre="Romance"
-                    data-desc="With Spider-Man's identity now revealed, Peter asks Doctor Strange for help. When a spell goes wrong, dangerous foes from other worlds start to appear."
-                    data-trailer="REPLACE_WITH_YOUTUBE_ID_SPIDERMAN">
-                    <img src="img/spiderman.jpg" alt="Spider-Man" />
-                </div>
+        <!-- COMING SOON -->
+        <section class="movie-section">
+            <h2 class="section-title">Coming Soon</h2>
+            <div class="movie-grid">
+                <?php foreach ($comingSoon as $movie): ?>
+                    <?php movieCard($movie, $wishlistIds, $isLoggedIn, 'Notify Me'); ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
 
-                <div class="carousel-item" data-bg="img/johnWickfromTMBD.jpg" data-title-img="img/Jhon Wick.jpg"
-                    data-year="2023" data-rating="15+" data-duration="2h 9min" data-genre="Action"
-                    data-desc="John Wick uncovers a path to defeating The High Table, but before he can earn his freedom, he must face off against a new enemy."
-                    data-trailer="REPLACE_WITH_YOUTUBE_ID_JOHNWICK">
-                    <img src="img/Jhon Wick.jpg" alt="John Wick" />
-                </div>
+        <!-- POPULAR -->
+        <section class="movie-section">
+            <h2 class="section-title">Popular</h2>
+            <div class="movie-grid">
+                <?php foreach ($popularMovies as $index => $movie):
+                    $isFallback = !empty($movie['is_fallback']);
+                    $inWishlist = !$isFallback && in_array($movie['movie_id'], $wishlistIds);
+                    ?>
+                    <div class="movie-card">
+                        <span class="rank"><?php echo $index + 1; ?></span>
+                        <?php if ($isLoggedIn && !$isFallback): ?>
+                            <button class="heart-btn <?php echo $inWishlist ? 'active' : ''; ?>"
+                                data-movie-id="<?php echo (int) $movie['movie_id']; ?>" onclick="toggleWishlist(this)"
+                                title="Add to wishlist">
+                                <i class="<?php echo $inWishlist ? 'fa-solid' : 'fa-regular'; ?> fa-heart"></i>
+                            </button>
+                        <?php endif; ?>
+                        <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($movie['title']); ?>" />
+                        <div class="movie-info">
+                            <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
+                            <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
+                            </p>
+                            <a href="#" class="btn-book">Book Ticket</a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
 
-                <div class="carousel-item" data-bg="img/UTRHfromTMD.jpg" data-title-img="img/UTRHLogoPoster.jpg"
-                    data-year="2023" data-rating="12+" data-duration="2h 5min" data-genre="Sci-Fi"
-                    data-desc="There's a mystery afoot in Gotham City, and Batman must go toe-to-toe with a mysterious vigilante, who goes by the name of Red Hood. Subsequently, old wounds reopen and old, once buried memories come into the light"
-                    data-trailer="REPLACE_WITH_YOUTUBE_ID_REDHOOD">
-                    <img src="img/5GZRRD4Q9kQhyveYU3CFw27sQxi.jpg" alt="Ant Man" />
-                </div>
-
-                <div class="carousel-item" data-bg="img/the-avengers-in-the-avengers-2012.jpg"
-                    data-title-img="img/AvengersfromTMDB.jpg" data-year="2019" data-rating="12+" data-duration="3h 1min"
-                    data-genre="Action"
-                    data-desc="The remaining Avengers must find a way to bring back their fallen allies for one final, epic battle."
-                    data-trailer="REPLACE_WITH_YOUTUBE_ID_AVENGERS">
-                    <img src="img/avengers.jpg" alt="Avengers" />
-                </div>
-
-                <div class="carousel-item" data-bg="img/MoonKnightfromTMD.jpg" data-title-img="img/MoonKnightPoster.jpg"
-                    data-year="2022" data-rating="15+" data-duration="6 episodes" data-genre="Fantasy"
-                    data-desc="A man with dissociative identity disorder becomes entangled in a deadly mystery involving Egyptian gods."
-                    data-trailer="REPLACE_WITH_YOUTUBE_ID_MOONKNIGHT">
-                    <img src="img/moon knight.jpg" alt="Moon Knight" />
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- NOW SHOWING -->
-    <section class="movie-section">
-        <h2 class="section-title">Now Showing</h2>
-        <div class="movie-grid">
-            <div class="movie-card">
-                <img src="img/Jhon Wick.jpg" alt="John Wick" />
-                <div class="movie-info">
-                    <h3>John Wick</h3>
-                    <p>Action • 2h 9min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="img/thor love of thunder.jpg" alt="Thor: Love and Thunder" />
-                <div class="movie-info">
-                    <h3>Thor: Love and Thunder</h3>
-                    <p>Action • 1h 59min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="img/spiderman.jpg" alt="Spider-Man" />
-                <div class="movie-info">
-                    <h3>Spider-Man</h3>
-                    <p>Romance • 2h 14min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="img/avengers.jpg" alt="Avengers" />
-                <div class="movie-info">
-                    <h3>Avengers</h3>
-                    <p>Action • 3h 1min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- COMING SOON -->
-    <section class="movie-section">
-        <h2 class="section-title">Coming Soon</h2>
-        <div class="movie-grid">
-            <div class="movie-card">
-                <img src="img/moon knight.jpg" alt="Moon Knight" />
-                <span class="badge">Releasing Aug 15</span>
-                <div class="movie-info">
-                    <h3>Moon Knight</h3>
-                    <p>Fantasy • 6 episodes</p>
-                    <a href="#" class="btn-notify">Notify Me</a>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="img/money heist.jpg" alt="Money Heist" />
-                <span class="badge">Releasing Sep 2</span>
-                <div class="movie-info">
-                    <h3>Money Heist</h3>
-                    <p>Crime • 2h 10min</p>
-                    <a href="#" class="btn-notify">Notify Me</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- POPULAR -->
-    <section class="movie-section">
-        <h2 class="section-title">Popular</h2>
-        <div class="movie-grid">
-            <div class="movie-card">
-                <span class="rank">1</span>
-                <img src="img/avengers.jpg" alt="Avengers" />
-                <div class="movie-info">
-                    <h3>Avengers</h3>
-                    <p>Action • 3h 1min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-            <div class="movie-card">
-                <span class="rank">2</span>
-                <img src="img/Jhon Wick.jpg" alt="John Wick" />
-                <div class="movie-info">
-                    <h3>John Wick</h3>
-                    <p>Action • 2h 9min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-            <div class="movie-card">
-                <span class="rank">3</span>
-                <img src="img/spiderman.jpg" alt="Spider-Man" />
-                <div class="movie-info">
-                    <h3>Spider-Man</h3>
-                    <p>Romance • 2h 14min</p>
-                    <a href="#" class="btn-book">Book Ticket</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    <?php endif; ?>
 
     <!-- FOOTER -->
     <footer class="site-footer">
@@ -214,10 +225,10 @@ $isLoggedIn = isset($_SESSION['user_id']);
             <div class="footer-col">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="#">Now Showing</a></li>
-                    <li><a href="#">Coming Soon</a></li>
-                    <li><a href="/profile/profile.php">My Bookings</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="home.php">Now Showing</a></li>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="contact.php">Contact</a></li>
+                    <li><a href="profile.php" ,>My Bookings</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -234,14 +245,11 @@ $isLoggedIn = isset($_SESSION['user_id']);
         </div>
     </footer>
 
-    <ul class="sci">
-        <li><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
-        <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
-        <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-    </ul>
-
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        const CINEBOOKING_LOGGED_IN = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
+    </script>
     <script src="home.js"></script>
 </body>
 

@@ -2,6 +2,20 @@
 session_start();
 require '../database/db.php';
 
+function formatDuration($minutes)
+{
+    $minutes = (int) $minutes;
+    if ($minutes <= 0)
+        return '';
+    $h = intdiv($minutes, 60);
+    $m = $minutes % 60;
+    if ($h > 0 && $m > 0)
+        return "{$h}h {$m}min";
+    if ($h > 0)
+        return "{$h}h";
+    return "{$m}min";
+}
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: /login/login.html");
     exit;
@@ -43,7 +57,7 @@ $wishlist = [];
 $wishlistReady = true;
 try {
     $stmt = $pdo->prepare("
-        SELECT w.wishlist_id, m.movie_id, m.title, m.genre, m.duration_minutes
+        SELECT w.wishlist_id, m.movie_id, m.title, m.genre, m.duration_minutes, m.poster_url
         FROM wishlist w
         JOIN movies m ON w.movie_id = m.movie_id
         WHERE w.user_id = ?
@@ -187,8 +201,13 @@ try {
                     <div class="wishlist-grid">
                         <?php foreach ($wishlist as $item): ?>
                             <div class="wishlist-card">
-                                <h3><?php echo htmlspecialchars($item['title']); ?></h3>
-                                <p><?php echo htmlspecialchars($item['genre']); ?></p>
+                                <img src="/<?php echo htmlspecialchars($item['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
+                                    alt="<?php echo htmlspecialchars($item['title']); ?>" />
+                                <div class="wishlist-card-info">
+                                    <h3><?php echo htmlspecialchars($item['title']); ?></h3>
+                                    <p><?php echo htmlspecialchars($item['genre']); ?><?php echo $item['duration_minutes'] ? ' • ' . formatDuration($item['duration_minutes']) : ''; ?>
+                                    </p>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
