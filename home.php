@@ -36,6 +36,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
     $isFallback = !empty($movie['is_fallback']);
     $inWishlist = !$isFallback && in_array($movie['movie_id'], $wishlistIds);
     $poster = $movie['poster_url'] ?: 'img/placeholder-poster.jpg';
+    $isNotify = $buttonLabel === 'Notify Me';
     ?>
     <div class="movie-card">
         <?php if ($isLoggedIn && !$isFallback): ?>
@@ -49,7 +50,17 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
             </p>
-            <a href="#" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
+            <?php if ($isNotify && $isLoggedIn && !$isFallback): ?>
+                <button type="button"
+                    class="btn-notify notify-toggle <?php echo $inWishlist ? 'notified' : ''; ?>"
+                    data-movie-id="<?php echo (int) $movie['movie_id']; ?>" onclick="toggleNotify(this)">
+                    <?php echo $inWishlist ? 'Notified ✓' : 'Notify Me'; ?>
+                </button>
+            <?php elseif ($isNotify): ?>
+                <a href="<?php echo $isFallback ? '/login/login.html' : '#'; ?>" class="btn-notify"><?php echo htmlspecialchars($buttonLabel); ?></a>
+            <?php else: ?>
+                <a href="<?php echo $isFallback ? '#' : 'movie.php?id=' . (int) $movie['movie_id']; ?>" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
+            <?php endif; ?>
         </div>
     </div>
     <?php
@@ -80,10 +91,15 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
         </form>
 
         <?php if ($isLoggedIn): ?>
-            <a href="profile/profile.php" , class="profile-btn">
-                <i class="fa-solid fa-circle-user"></i>
-                <?php echo htmlspecialchars($_SESSION['name']); ?>
-            </a>
+            <div class="header-right">
+                <a href="profile/profile.php?tab=wishlist" class="mylist-btn" title="My List">
+                    <i class="fa-solid fa-heart"></i>
+                </a>
+                <a href="profile/profile.php" class="profile-btn">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <?php echo htmlspecialchars($_SESSION['name']); ?>
+                </a>
+            </div>
         <?php else: ?>
             <a href="/login/login.html" class="auth-btn">Login / Register</a>
         <?php endif; ?>
@@ -206,7 +222,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
                             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
                             </p>
-                            <a href="#" class="btn-book">Book Ticket</a>
+                            <a href="<?php echo $isFallback ? '#' : 'movie.php?id=' . (int) $movie['movie_id']; ?>" class="btn-book">Book Ticket</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -228,7 +244,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                     <li><a href="home.php">Now Showing</a></li>
                     <li><a href="about.php">About Us</a></li>
                     <li><a href="contact.php">Contact</a></li>
-                    <li><a href="profile.php" ,>My Bookings</a></li>
+                    <li><a href="profile/profile.php">My Bookings</a></li>
                 </ul>
             </div>
             <div class="footer-col">

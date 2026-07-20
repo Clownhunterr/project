@@ -160,6 +160,25 @@ function getCarouselMovies(PDO $pdo, $limit = 5)
     return getNowShowing($pdo, $limit);
 }
 
+function getMovieById(PDO $pdo, $movieId)
+{
+    $movieId = (int) $movieId;
+
+    if ($movieId < 0) {
+        foreach (getFallbackMovies() as $m) {
+            if ($m['movie_id'] === $movieId) {
+                return $m;
+            }
+        }
+        return null;
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM movies WHERE movie_id = ?");
+    $stmt->execute([$movieId]);
+    $movie = $stmt->fetch();
+    return $movie ?: null;
+}
+
 function getMovieCount(PDO $pdo)
 {
     return (int) $pdo->query("SELECT COUNT(*) AS c FROM movies")->fetch()['c'];

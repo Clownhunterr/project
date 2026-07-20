@@ -46,6 +46,33 @@ function updateMovie(item) {
     currentTrailer = item.dataset.trailer || "";
 }
 
+function toggleNotify(button) {
+    if (typeof CINEBOOKING_LOGGED_IN !== 'undefined' && !CINEBOOKING_LOGGED_IN) {
+        window.location.href = '/login/login.html';
+        return;
+    }
+
+    const movieId = button.dataset.movieId;
+
+    fetch('wishlist_toggle.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `movie_id=${encodeURIComponent(movieId)}`
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                if (data.message) alert(data.message);
+                return;
+            }
+            button.classList.toggle('notified', data.inWishlist);
+            button.textContent = data.inWishlist ? 'Notified ✓' : 'Notify Me';
+        })
+        .catch(() => {
+            alert('Something went wrong. Please try again.');
+        });
+}
+
 function toggleWishlist(button) {
     if (typeof CINEBOOKING_LOGGED_IN !== 'undefined' && !CINEBOOKING_LOGGED_IN) {
         window.location.href = '/login/login.html';
@@ -113,9 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Click on the dark backdrop (anywhere outside the video itself) closes the trailer.
-    // stopPropagation on the wrapper is a second safety net so clicks on the video
-    // controls/letterboxing never bubble up and accidentally trigger a close.
     const trailerOverlay = document.getElementById('trailerOverlay');
     const videoWrapper = document.querySelector('.video-wrapper');
 
