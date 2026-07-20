@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Login to Dashboard</button>
         </form>
 
-        <a href="../home.php" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+        <a href="../index.php" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
     </div>
 
 </body>

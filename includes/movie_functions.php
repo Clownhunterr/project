@@ -150,7 +150,7 @@ function getComingSoon(PDO $pdo, $limit = null)
 function getPopularMovies(PDO $pdo, $limit = 4)
 {
     $sql = "
-        SELECT m.*, COUNT(bs.seat_id) AS tickets_sold
+        SELECT m.*, COUNT(bs.id) AS tickets_sold
         FROM movies m
         JOIN showtimes s ON m.movie_id = s.movie_id
         JOIN bookings b ON s.showtime_id = b.showtime_id AND b.status = 'confirmed'

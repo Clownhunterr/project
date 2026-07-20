@@ -23,16 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <header>
-        <a href="home.php" class="logo">CineBooking</a>
-        <form class="search" method="GET" action="home.php">
+        <a href="index.php" class="logo">CineBooking</a>
+        <form class="search" method="GET" action="index.php">
             <input type="text" name="search" placeholder="Search movies, genres..." />
             <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
         <?php if ($isLoggedIn): ?>
-            <a href="profile.php" , class="profile-btn"><i class="fa-solid fa-circle-user"></i>
+            <a href="profile/profile.php" class="profile-btn"><i class="fa-solid fa-circle-user"></i>
                 <?php echo htmlspecialchars($_SESSION['name']); ?></a>
         <?php else: ?>
-            <a href="/login/login.html" class="auth-btn">Login / Register</a>
+            <a href="login/login.php" class="auth-btn">Login / Register</a>
         <?php endif; ?>
     </header>
 
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="footer-col">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="home.php">Now Showing</a></li>
+                    <li><a href="index.php">Now Showing</a></li>
                     <li><a href="about.php">About Us</a></li>
                     <li><a href="contact.php">Contact</a></li>
                 </ul>

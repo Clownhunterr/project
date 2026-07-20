@@ -17,7 +17,7 @@ function formatDuration($minutes)
 }
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /login/login.html");
+    header("Location: ../login/login.php");
     exit;
 }
 
@@ -29,7 +29,7 @@ $user = $stmt->fetch();
 
 if (!$user) {
     session_destroy();
-    header("Location: /login/login.html");
+    header("Location: ../login/login.php");
     exit;
 }
 
@@ -83,7 +83,7 @@ try {
 <body>
 
     <header>
-        <a href="/home.php" class="logo">CineBooking</a>
+        <a href="../index.php" class="logo">CineBooking</a>
         <div class="search">
             <input type="text" placeholder="Search" />
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -153,7 +153,7 @@ try {
                     <div class="empty-state">
                         <i class="fa-solid fa-ticket"></i>
                         <p>You haven't booked any tickets yet.</p>
-                        <a href="/home.php" class="btn-primary">Browse Movies</a>
+                        <a href="../index.php" class="btn-primary">Browse Movies</a>
                     </div>
                 <?php else: ?>
                     <div class="booking-list">
@@ -175,7 +175,13 @@ try {
                                         <?php echo htmlspecialchars(ucfirst($booking['status'])); ?>
                                     </span>
                                     <p class="booking-amount">Rs. <?php echo number_format($booking['total_amount'], 2); ?></p>
-                                    <p class="booking-code"><?php echo htmlspecialchars($booking['barcode_value']); ?></p>
+                                    <?php if (strcasecmp($booking['status'], 'confirmed') === 0): ?>
+                                        <a href="../booking/view_ticket.php?booking_id=<?php echo $booking['booking_id']; ?>" 
+                                           class="btn-view-ticket" 
+                                           style="display: inline-block; margin-top: 10px; padding: 6px 12px; background: #fd6565; color: #fff; border-radius: 4px; font-size: 12px; text-decoration: none; font-weight: 600; text-align: center; transition: .2s ease;">
+                                            <i class="fa-solid fa-ticket" style="margin-right: 4px;"></i> View Ticket
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -195,13 +201,13 @@ try {
                     <div class="empty-state">
                         <i class="fa-solid fa-heart"></i>
                         <p>Your wishlist is empty.</p>
-                        <a href="/home.php" class="btn-primary">Browse Movies</a>
+                        <a href="../index.php" class="btn-primary">Browse Movies</a>
                     </div>
                 <?php else: ?>
                     <div class="wishlist-grid">
                         <?php foreach ($wishlist as $item): ?>
                             <div class="wishlist-card">
-                                <img src="/<?php echo htmlspecialchars($item['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
+                                <img src="../<?php echo htmlspecialchars($item['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
                                     alt="<?php echo htmlspecialchars($item['title']); ?>" />
                                 <div class="wishlist-card-info">
                                     <h3><?php echo htmlspecialchars($item['title']); ?></h3>

@@ -80,6 +80,7 @@ $bookings = $stmt->fetchAll();
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Checked In</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,6 +96,17 @@ $bookings = $stmt->fetchAll();
                                 <td>Rs. <?php echo number_format($b['total_amount'], 2); ?></td>
                                 <td><?php echo htmlspecialchars(ucfirst($b['status'])); ?></td>
                                 <td><?php echo $b['checked_in'] ? 'Yes' : 'No'; ?></td>
+                                <td>
+                                    <?php if (strcasecmp($b['status'], 'confirmed') === 0): ?>
+                                        <a href="../booking/view_ticket.php?booking_id=<?php echo $b['booking_id']; ?>" 
+                                           class="btn-admin btn-admin-outline btn-sm" 
+                                           style="padding: 4px 8px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; border-radius: 4px;">
+                                            <i class="fa-solid fa-ticket"></i> View Ticket
+                                        </a>
+                                    <?php else: ?>
+                                        &mdash;
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

@@ -1,5 +1,40 @@
- <?php
+<?php
 session_start();
+
+if(isset($_SESSION['user_id'])){
+    header("Location: ../index.php");
+    exit();
+}
+
+require '../database/db.php';
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if ($name && $username && $email && $password) {
+        $stmt = $pdo->prepare("SELECT user_id, email, username FROM users WHERE email = ? OR username = ?");
+        $stmt->execute([$email, $username]);
+        $existing = $stmt->fetch();
+
+        if ($existing && $existing['email'] === $email) {
+            $error = "Email already registered.";
+        } elseif ($existing && $existing['username'] === $username) {
+            $error = "Username already taken.";
+        } else {
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO users (name, username, email, password_hash, role) VALUES (?, ?, ?, ?, 'customer')");
+            $stmt->execute([$name, $username, $email, $hashedPassword]);
+            header("Location: ../login/login.php?registered=1");
+            exit;
+        }
+    } else {
+        $error = "All fields are required.";
+    }
+}
 ?> 
 
 <!DOCTYPE html>
@@ -21,12 +56,16 @@ session_start();
 <div class="signup-box">
 
     <div class="logo">
-        <img src="/img/logo.png" alt="Logo">
+        <img src="../img/logo.png" alt="Logo">
         <h1>CineBooking</h1>
         <p>Create Your Account</p>
     </div>
+    
+    <?php if ($error): ?>
+        <p style="color:red; text-align:center; margin-bottom: 10px;"><?php echo htmlspecialchars($error); ?></p>
+    <?php endif; ?>
 
-    <form action="../auth/register.php" method="POST">
+    <form action="" method="POST">
 
         <div class="input-group">
             <label>Full Name</label>
@@ -64,7 +103,7 @@ session_start();
 
     <div class="login-link">
         <p>Already have an account?
-            <a href="../login/login.html">Login</a>
+            <a href="../login/login.php">Login</a>
         </p>
     </div>
 
