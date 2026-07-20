@@ -1,6 +1,6 @@
-<!-- <?php
+ <?php
 session_start();
-?> -->
+?> 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +64,7 @@ session_start();
 
     <div class="login-link">
         <p>Already have an account?
-            <a href="/login/login.html">Login</a>
+            <a href="../login/login.html">Login</a>
         </p>
     </div>
 

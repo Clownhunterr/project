@@ -85,7 +85,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                 <?php echo htmlspecialchars($_SESSION['name']); ?>
             </a>
         <?php else: ?>
-            <a href="/login/login.html" class="auth-btn">Login / Register</a>
+            <a href="login/login.php" class="auth-btn">Login / Register</a>
         <?php endif; ?>
     </header>
 
@@ -228,7 +228,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                     <li><a href="home.php">Now Showing</a></li>
                     <li><a href="about.php">About Us</a></li>
                     <li><a href="contact.php">Contact</a></li>
-                    <li><a href="profile.php" ,>My Bookings</a></li>
+                    <li><a href="/profile/profile.php" ,>My Bookings</a></li>
                 </ul>
             </div>
             <div class="footer-col">

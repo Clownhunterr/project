@@ -1,11 +1,11 @@
-<!-- <?php
+ <?php
 session_start();
 
 if(isset($_SESSION['user_id'])){
     header("Location: dashboard.php");
     exit();
 }
-?> -->
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,7 +76,7 @@ if(isset($_SESSION['user_id'])){
 
         <div class="signup">
             Don't have an account?
-            <a href="/signup/signup.html">Sign Up</a>
+            <a href="../signup/signup.php">Sign Up</a>
         </div>
 
     </div>
