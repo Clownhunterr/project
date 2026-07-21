@@ -50,6 +50,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
             </p>
+            <a href="<?php echo $buttonLabel === 'Book Ticket' ? 'booking/booking.php?id=' . (int)$movie['movie_id'] : '#'; ?>" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
             <?php if ($isNotify && $isLoggedIn && !$isFallback): ?>
                 <button type="button"
                     class="btn-notify notify-toggle <?php echo $inWishlist ? 'notified' : ''; ?>"
@@ -81,9 +82,9 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
 
 <body>
     <header>
-        <a href="home.php" class="logo">CineBooking</a>
+        <a href="index.php" class="logo">CineBooking</a>
 
-        <form class="search" method="GET" action="home.php">
+        <form class="search" method="GET" action="index.php">
             <input type="text" name="search" placeholder="Search movies, genres..."
                 value="<?php echo htmlspecialchars($searchQuery); ?>" />
             <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"
@@ -92,11 +93,12 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
 
         <?php if ($isLoggedIn): ?>
             <a href="profile/profile.php" class="profile-btn">
+            <a href="profile/profile.php" class="profile-btn">
                 <i class="fa-solid fa-circle-user"></i>
                 <?php echo htmlspecialchars($_SESSION['name']); ?>
             </a>
         <?php else: ?>
-            <a href="/login/login.html" class="auth-btn">Login / Register</a>
+            <a href="login/login.php" class="auth-btn">Login / Register</a>
         <?php endif; ?>
     </header>
 
@@ -115,7 +117,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                 <div class="empty-state">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <p>No movies matched your search.</p>
-                    <a href="home.php" class="btn-primary">Back to Home</a>
+                    <a href="index.php" class="btn-primary">Back to Home</a>
                 </div>
             <?php else: ?>
                 <div class="movie-grid">
@@ -147,7 +149,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                     <div class="button">
                         <a href="javascript:void(0)" onclick="openTrailer()"><i class="fa-solid fa-play"
                                 aria-hidden="true"></i>Watch Trailer</a>
-                        <a href="#"><i class="fa-solid fa-plus" aria-hidden="true"></i>Book Ticket</a>
+                        <a href="#" id="bannerBookBtn"><i class="fa-solid fa-plus" aria-hidden="true"></i>Book Ticket</a>
                     </div>
                 </div>
 
@@ -157,6 +159,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                             $titleImg = $movie['title_img'] ?? $movie['poster_url'];
                             ?>
                             <div class="carousel-item"
+                                data-movie-id="<?php echo (int)$movie['movie_id']; ?>"
                                 data-bg="<?php echo htmlspecialchars($movie['backdrop_url'] ?: $movie['poster_url']); ?>"
                                 data-title-img="<?php echo htmlspecialchars($titleImg); ?>"
                                 data-year="<?php echo $movie['release_date'] ? date('Y', strtotime($movie['release_date'])) : ''; ?>"
@@ -164,7 +167,8 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                                 data-duration="<?php echo formatDuration($movie['duration_minutes']); ?>"
                                 data-genre="<?php echo htmlspecialchars($movie['genre']); ?>"
                                 data-desc="<?php echo htmlspecialchars($movie['description']); ?>"
-                                data-trailer="<?php echo htmlspecialchars($movie['trailer_url']); ?>">
+                                data-trailer="<?php echo htmlspecialchars($movie['trailer_url']); ?>"
+                                data-status="<?php echo htmlspecialchars($movie['status']); ?>">
                                 <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
                                     alt="<?php echo htmlspecialchars($movie['title']); ?>" />
                             </div>
@@ -217,6 +221,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
                             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
                             </p>
+                            <a href="booking/booking.php?id=<?php echo (int)$movie['movie_id']; ?>" class="btn-book">Book Ticket</a>
                             <a href="<?php echo $isFallback ? '#' : 'movie.php?id=' . (int) $movie['movie_id']; ?>" class="btn-book">Book Ticket</a>
                         </div>
                     </div>
@@ -236,9 +241,10 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
             <div class="footer-col">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="home.php">Now Showing</a></li>
+                    <li><a href="index.php">Now Showing</a></li>
                     <li><a href="about.php">About Us</a></li>
                     <li><a href="contact.php">Contact</a></li>
+                    <li><a href="profile/profile.php">My Bookings</a></li>
                     <li><a href="profile/profile.php">My Bookings</a></li>
                 </ul>
             </div>

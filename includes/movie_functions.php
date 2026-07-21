@@ -102,7 +102,13 @@ function getNowShowing(PDO $pdo, $limit = null)
     if ($limit !== null) {
         $sql .= " LIMIT " . (int) $limit;
     }
-    $rows = $pdo->query($sql)->fetchAll();
+
+    try {
+        $rows = $pdo->query($sql)->fetchAll();
+    } catch (PDOException $e) {
+        // Schema doesn't have the expected columns yet — fall back safely
+        $rows = [];
+    }
 
     if (count($rows) === 0) {
         $rows = array_values(array_filter(getFallbackMovies(), function ($m) {
@@ -122,7 +128,12 @@ function getComingSoon(PDO $pdo, $limit = null)
     if ($limit !== null) {
         $sql .= " LIMIT " . (int) $limit;
     }
-    $rows = $pdo->query($sql)->fetchAll();
+
+    try {
+        $rows = $pdo->query($sql)->fetchAll();
+    } catch (PDOException $e) {
+        $rows = [];
+    }
 
     if (count($rows) === 0) {
         $rows = array_values(array_filter(getFallbackMovies(), function ($m) {
@@ -139,7 +150,7 @@ function getComingSoon(PDO $pdo, $limit = null)
 function getPopularMovies(PDO $pdo, $limit = 4)
 {
     $sql = "
-        SELECT m.*, COUNT(bs.seat_id) AS tickets_sold
+        SELECT m.*, COUNT(bs.id) AS tickets_sold
         FROM movies m
         JOIN showtimes s ON m.movie_id = s.movie_id
         JOIN bookings b ON s.showtime_id = b.showtime_id AND b.status = 'confirmed'
@@ -147,7 +158,12 @@ function getPopularMovies(PDO $pdo, $limit = 4)
         GROUP BY m.movie_id
         ORDER BY tickets_sold DESC
         LIMIT " . (int) $limit;
-    $popular = $pdo->query($sql)->fetchAll();
+
+    try {
+        $popular = $pdo->query($sql)->fetchAll();
+    } catch (PDOException $e) {
+        $popular = [];
+    }
 
     if (count($popular) === 0) {
         $popular = getNowShowing($pdo, $limit);
@@ -191,7 +207,11 @@ function getMovieById(PDO $pdo, $movieId)
 
 function getMovieCount(PDO $pdo)
 {
-    return (int) $pdo->query("SELECT COUNT(*) AS c FROM movies")->fetch()['c'];
+    try {
+        return (int) $pdo->query("SELECT COUNT(*) AS c FROM movies")->fetch()['c'];
+    } catch (PDOException $e) {
+        return 0;
+    }
 }
 
 function searchMovies(PDO $pdo, $query)
@@ -206,15 +226,19 @@ function searchMovies(PDO $pdo, $query)
     }
 
     $like = '%' . $query . '%';
-    $stmt = $pdo->prepare("
-        SELECT * FROM movies
-        WHERE title LIKE ?
-           OR genre LIKE ?
-           OR CAST(duration_minutes AS CHAR) LIKE ?
-        ORDER BY release_date DESC
-    ");
-    $stmt->execute([$like, $like, $like]);
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->prepare("
+            SELECT * FROM movies
+            WHERE title LIKE ?
+               OR genre LIKE ?
+               OR CAST(duration_minutes AS CHAR) LIKE ?
+            ORDER BY release_date DESC
+        ");
+        $stmt->execute([$like, $like, $like]);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
 }
 
 function isInWishlist(PDO $pdo, $userId, $movieId)
@@ -222,14 +246,22 @@ function isInWishlist(PDO $pdo, $userId, $movieId)
     if ($movieId < 0) {
         return false;
     }
-    $stmt = $pdo->prepare("SELECT 1 FROM wishlist WHERE user_id = ? AND movie_id = ?");
-    $stmt->execute([$userId, $movieId]);
-    return (bool) $stmt->fetch();
+    try {
+        $stmt = $pdo->prepare("SELECT 1 FROM wishlist WHERE user_id = ? AND movie_id = ?");
+        $stmt->execute([$userId, $movieId]);
+        return (bool) $stmt->fetch();
+    } catch (PDOException $e) {
+        return false;
+    }
 }
 
 function getUserWishlistIds(PDO $pdo, $userId)
 {
-    $stmt = $pdo->prepare("SELECT movie_id FROM wishlist WHERE user_id = ?");
-    $stmt->execute([$userId]);
-    return array_column($stmt->fetchAll(), 'movie_id');
+    try {
+        $stmt = $pdo->prepare("SELECT movie_id FROM wishlist WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        return array_column($stmt->fetchAll(), 'movie_id');
+    } catch (PDOException $e) {
+        return [];
+    }
 }

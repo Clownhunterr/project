@@ -44,6 +44,20 @@ function updateMovie(item) {
     if (descEl) descEl.textContent = item.dataset.desc;
 
     currentTrailer = item.dataset.trailer || "";
+
+    // Wire the "Book Ticket" banner button to this movie
+    const bookBtn = document.getElementById('bannerBookBtn');
+    if (bookBtn) {
+        const mid = item.dataset.movieId || '';
+        const isComingSoon = (item.dataset.status || '') === 'coming_soon';
+        if (mid && !isComingSoon) {
+            bookBtn.href = 'booking/booking.php?id=' + mid;
+            bookBtn.innerHTML = '<i class="fa-solid fa-plus" aria-hidden="true"></i>Book Ticket';
+        } else {
+            bookBtn.href = '#';
+            bookBtn.innerHTML = '<i class="fa-solid fa-bell" aria-hidden="true"></i>Notify Me';
+        }
+    }
 }
 
 function toggleNotify(button) {
@@ -75,7 +89,7 @@ function toggleNotify(button) {
 
 function toggleWishlist(button) {
     if (typeof CINEBOOKING_LOGGED_IN !== 'undefined' && !CINEBOOKING_LOGGED_IN) {
-        window.location.href = '/login/login.html';
+        window.location.href = 'login/login.php';
         return;
     }
 

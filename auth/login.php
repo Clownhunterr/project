@@ -21,17 +21,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['role'] = $user['role'];
-            header("Location: /home.php");
+            $next = $_GET['next'] ?? '';
+            if ($next) {
+                header("Location: ../" . ltrim($next, '/'));
+            } else {
+                header("Location: ../index.php");
+            }
             exit;
         }
     }
 
     // Any failure (missing fields, no matching user, wrong password) sends
     // back to the login page with an error flag.
-    header("Location: /login/login.html?error=1");
+    header("Location: ../login/login.php?error=1");
     exit;
 }
 
 // Direct GET visit - there's no bare form here anymore, go to the real page.
-header("Location: /login/login.html");
+header("Location: ../login/login.php");
 exit;

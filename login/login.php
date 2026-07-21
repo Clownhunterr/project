@@ -1,11 +1,44 @@
-<!-- <?php
+<?php
 session_start();
 
 if(isset($_SESSION['user_id'])){
-    header("Location: dashboard.php");
+    header("Location: ../index.php");
     exit();
 }
-?> -->
+
+require '../database/db.php';
+$error = isset($_GET['error']) ? 1 : 0;
+$errorMessage = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $identifier = trim($_POST['identifier'] ?? ''); // username OR email
+    $password = $_POST['password'] ?? '';
+
+    if ($identifier && $password) {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$identifier, $identifier]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password_hash'])) {
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['role'] = $user['role'];
+            
+            $next = $_GET['next'] ?? '';
+            if ($next) {
+                header("Location: ../" . ltrim($next, '/'));
+            } else {
+                header("Location: ../index.php");
+            }
+            exit;
+        }
+    }
+    
+    // Any failure
+    $error = 1;
+    $errorMessage = 'Invalid username or password.';
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -29,12 +62,16 @@ if(isset($_SESSION['user_id'])){
     <div class="login-box">
 
         <div class="logo">
-            <img src="/img/logo.png" alt="Logo">
+            <img src="../img/logo.png" alt="Logo">
             <h1>CineBooking</h1>
             <p>Book Movies Anytime, Anywhere</p>
         </div>
+        
+        <?php if ($error): ?>
+            <p style="color:red; text-align:center; margin-bottom: 10px;"><?php echo $errorMessage ?: 'Invalid login credentials.'; ?></p>
+        <?php endif; ?>
 
-        <form action="../auth/login.php" method="POST">
+        <form action="" method="POST">
 
             <div class="input-group">
                 <label>Username or Email</label>
@@ -76,7 +113,7 @@ if(isset($_SESSION['user_id'])){
 
         <div class="signup">
             Don't have an account?
-            <a href="/signup/signup.html">Sign Up</a>
+            <a href="../signup/signup.php">Sign Up</a>
         </div>
 
     </div>

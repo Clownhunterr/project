@@ -1,4 +1,4 @@
--- CineBooking database schema
+movie_ticket_db-- CineBooking database schema
 --
 -- NOTE FOR SUMAN/SHATTERED: the old version of this file had two bugs that
 -- would have broken the whole site:

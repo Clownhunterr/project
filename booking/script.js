@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ticTemplate = document.querySelector('.ticket .tic');
   const ticTemplateHTML = ticTemplate ? ticTemplate.outerHTML : null;
 
-  const MAX_SEATS_PER_TICKET = 5;
+  const MAX_SEATS_PER_TICKET = 2;
 
   // ---- eSewa ePay v2 (sandbox/UAT) config ----
   const ESEWA_SECRET       = '8gBm/:&EnhH.1/q';
@@ -66,16 +66,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedSeats = [];
   let selectedDate  = null;
   let selectedTime  = null;
+  let activeBarcodeValue = null;
 
   /* ---------- 2. Hide ticket screen on load ---------- */
   if (ticketSection) ticketSection.style.display = 'none';
 
-  /* ---------- 3. Randomly mark some seats as already booked ---------- */
-  seats.forEach(seat => {
-    if (Math.random() < 0.15) {
-      seat.classList.add('booked');
-    }
-  });
+  // We initialize selectedDate and selectedTime from DOM on load
+  const activeDateEl = document.querySelector('.date_point.h6_active');
+  if (activeDateEl) {
+    const li = activeDateEl.closest('li');
+    const day = li?.querySelector('h6:first-child')?.textContent.trim();
+    const num = activeDateEl.textContent.trim();
+    const fullDate = activeDateEl.dataset.fulldate;
+    selectedDate = { day, num, fullDate };
+  }
+
+  const activeTimeEl = document.querySelector('.right_card .card_month li h6.h6_active');
+  if (activeTimeEl) {
+    selectedTime = activeTimeEl.textContent.trim();
+  }
 
   /* ---------- 3b. Poster preview: image <-> video toggle ---------- */
   if (posterVideo) {
@@ -117,7 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const day  = li.querySelector('h6:first-child')?.textContent.trim();
       const num  = point?.textContent.trim();
-      selectedDate = { day, num };
+      const fullDate = point?.dataset?.fulldate;
+      selectedDate = { day, num, fullDate };
+      fetchBookedSeats();
     });
   });
 
@@ -132,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (timeHeading) timeHeading.classList.add('h6_active');
 
       selectedTime = timeHeading ? timeHeading.textContent.trim() : null;
+      fetchBookedSeats();
     });
   });
 
@@ -210,134 +222,132 @@ document.addEventListener('DOMContentLoaded', () => {
           cursor: pointer; transition: .3s linear;">
         Pay via eSewa
       </button>
+      <button type="button" class="pay_simulate" style="
+          display: flex; align-items: center; justify-content: center;
+          padding: 14px 20px; border-radius: 10px; border: none;
+          background: #4A5568; color: #fff; font-size: 14px; font-weight: 600;
+          cursor: pointer; transition: .3s linear;">
+        <i class="bi bi-magic" style="margin-right: 8px;"></i> Simulate Payment (Testing)
+      </button>
     </div>
     <div class="payment_status" style="margin-top: 20px; font-size: 12px; color: rgb(184,184,184,.7);"></div>
   `;
   ticketSection?.insertAdjacentElement('afterend', paymentSection);
 
   const payEsewaBtn   = paymentSection.querySelector('.pay_esewa');
+  const paySimulateBtn= paymentSection.querySelector('.pay_simulate');
   const paymentTotal  = paymentSection.querySelector('.payment_total');
   const paymentStatus = paymentSection.querySelector('.payment_status');
 
   /* ---------- eSewa ePay v2: signature + form submission ---------- */
-  async function generateEsewaSignature(totalAmount, transactionUuid, productCode) {
-    const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
-    return hmacSha256Base64(message, ESEWA_SECRET);
-  }
-
   async function payViaEsewa() {
     if (payEsewaBtn) payEsewaBtn.disabled = true;
     if (paymentStatus) paymentStatus.textContent = 'Preparing secure payment...';
 
-    const amount        = selectedSeats.length * PRICE_PER_SEAT;
-    const taxAmount      = 0;
-    const serviceCharge  = 0;
-    const deliveryCharge = 0;
-    const totalAmount    = amount + taxAmount + serviceCharge + deliveryCharge;
-    const transactionUuid = `${Date.now()}`;
+    // Get movie ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('id');
 
-    let signature;
-    try {
-      signature = await generateEsewaSignature(totalAmount, transactionUuid, ESEWA_PRODUCT_CODE);
-    } catch (err) {
-      console.error(err);
-      if (paymentStatus) paymentStatus.textContent = '';
-      if (payEsewaBtn) payEsewaBtn.disabled = false;
-      alert(err.message || 'Could not prepare the payment. Please try again.');
-      return;
-    }
-
-    if (paymentStatus) paymentStatus.textContent = '';
-    if (payEsewaBtn) payEsewaBtn.disabled = false;
-
-    sessionStorage.setItem(ESEWA_STORAGE_KEY, JSON.stringify({
-      seats: selectedSeats.map(s => ({ row: s.row, seatNumber: s.seatNumber })),
-      date: selectedDate,
-      time: selectedTime,
-      transactionUuid
-    }));
-
-    const fields = {
-      amount: String(amount),
-      tax_amount: String(taxAmount),
-      total_amount: String(totalAmount),
-      transaction_uuid: transactionUuid,
-      product_code: ESEWA_PRODUCT_CODE,
-      product_service_charge: String(serviceCharge),
-      product_delivery_charge: String(deliveryCharge),
-      success_url: ESEWA_RETURN_URL,
-      failure_url: ESEWA_RETURN_URL,
-      signed_field_names: 'total_amount,transaction_uuid,product_code',
-      signature
+    const bookingData = {
+        movie_id: movieId,
+        date: selectedDate.fullDate,
+        time: selectedTime,
+        seats: selectedSeats.map(s => ({ row: s.row, seatNumber: s.seatNumber }))
     };
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = ESEWA_FORM_URL;
-    form.style.display = 'none';
+    try {
+        const response = await fetch('prepare_booking.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to prepare booking');
+        }
 
-    Object.entries(fields).forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.name = name;
-      input.value = value;
-      form.appendChild(input);
-    });
+        if (paymentStatus) paymentStatus.textContent = 'Redirecting to eSewa...';
 
-    document.body.appendChild(form);
-    form.submit();
+        const fields = {
+            amount: String(data.total_amount),
+            tax_amount: "0",
+            total_amount: String(data.total_amount),
+            transaction_uuid: data.transaction_uuid,
+            product_code: data.product_code,
+            product_service_charge: "0",
+            product_delivery_charge: "0",
+            success_url: ESEWA_RETURN_URL,
+            failure_url: ESEWA_RETURN_URL,
+            signed_field_names: 'total_amount,transaction_uuid,product_code',
+            signature: data.signature
+        };
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = ESEWA_FORM_URL;
+        form.style.display = 'none';
+
+        Object.entries(fields).forEach(([name, value]) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+
+    } catch (err) {
+        console.error(err);
+        if (paymentStatus) paymentStatus.textContent = '';
+        if (payEsewaBtn) payEsewaBtn.disabled = false;
+        alert(err.message || 'Could not prepare the payment. Please try again.');
+    }
   }
 
-  /* ---------- Handle returning from eSewa after payment ---------- */
-  async function checkEsewaReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const dataParam = params.get('data');
-    if (!dataParam) return;
+  async function payViaSimulation() {
+    if (paySimulateBtn) paySimulateBtn.disabled = true;
+    if (paymentStatus) paymentStatus.textContent = 'Simulating payment on server...';
 
-    history.replaceState(null, '', window.location.pathname);
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('id');
 
-    let parsed;
-    try {
-      parsed = JSON.parse(atob(dataParam));
-    } catch (err) {
-      console.error('Failed to parse eSewa return data:', err);
-      return;
-    }
+    const bookingData = {
+        movie_id: movieId,
+        date: selectedDate.fullDate,
+        time: selectedTime,
+        seats: selectedSeats.map(s => ({ row: s.row, seatNumber: s.seatNumber }))
+    };
 
     try {
-      if (parsed.signed_field_names && parsed.signature) {
-        const fieldNames = parsed.signed_field_names.split(',');
-        const message = fieldNames.map(f => `${f}=${parsed[f]}`).join(',');
-        const expected = await hmacSha256Base64(message, ESEWA_SECRET);
-        if (expected !== parsed.signature) {
-          console.warn('eSewa response signature mismatch — treating as untrusted.');
-          alert('Payment verification failed. Please contact support before assuming this booking is confirmed.');
-          showScreen('booking');
-          return;
+        const response = await fetch('prepare_simulation.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to simulate booking');
         }
-      }
+
+        if (paymentStatus) paymentStatus.textContent = 'Payment successful! Redirecting to ticket...';
+        window.location.href = `view_ticket.php?booking_id=${data.booking_id}&show_ticket=1`;
+
     } catch (err) {
-      console.error('Could not verify eSewa signature:', err);
-    }
-
-    const stored = sessionStorage.getItem(ESEWA_STORAGE_KEY);
-    const booking = stored ? JSON.parse(stored) : null;
-    sessionStorage.removeItem(ESEWA_STORAGE_KEY);
-
-    if (parsed.status === 'COMPLETE' && booking) {
-      selectedSeats = booking.seats.map(s => ({ row: s.row, seatNumber: s.seatNumber, el: null }));
-      selectedDate = booking.date;
-      selectedTime = booking.time;
-
-      renderTicket();
-      showScreen('ticket');
-    } else {
-      alert('Payment was not completed. Please try again.');
-      showScreen('booking');
+        console.error(err);
+        if (paymentStatus) paymentStatus.textContent = '';
+        if (paySimulateBtn) paySimulateBtn.disabled = false;
+        alert(err.message || 'Simulation failed.');
     }
   }
 
   payEsewaBtn?.addEventListener('click', payViaEsewa);
+  paySimulateBtn?.addEventListener('click', payViaSimulation);
 
   /* ---------- 10. Book button: validate + go to payment screen ---------- */
   bookBtn?.addEventListener('click', () => {
@@ -365,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- 11. Back button: step backward through the screens ---------- */
   backBtn?.addEventListener('click', () => {
     if (currentScreen === 'ticket') {
-      showScreen('payment');
+      window.location.href = '../profile/profile.php#tab-bookings';
     } else if (currentScreen === 'payment') {
       showScreen('booking');
     } else {
@@ -432,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       ticketSection.appendChild(ticEl);
 
-      const code = `J${Date.now().toString().slice(-8)}${ticketIndex}`;
+      const code = activeBarcodeValue || `J${Date.now().toString().slice(-8)}${ticketIndex}`;
       if (svg && window.JsBarcode) {
         JsBarcode(svg, code);
       }
@@ -455,5 +465,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
   showScreen('booking');
 
-  checkEsewaReturn();
+  // Load booked seats on page init
+  fetchBookedSeats();
+
+  // Check if we were redirected to show a ticket
+  checkForRedirectedTicket();
+
+  // ---- Fetch booked seats dynamically from DB ----
+  async function fetchBookedSeats() {
+    if (!selectedDate?.fullDate || !selectedTime) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('id');
+
+    try {
+      const response = await fetch(`get_booked_seats.php?movie_id=${movieId}&date=${selectedDate.fullDate}&time=${selectedTime}`);
+      const data = await response.json();
+      if (data.success) {
+        // Reset all seats
+        seats.forEach(seat => {
+          seat.classList.remove('booked');
+          seat.classList.remove('selected');
+        });
+        selectedSeats = [];
+        updateSeatSummary();
+
+        // Mark fetched seats as booked
+        data.booked_seats.forEach(bs => {
+          const seatEl = Array.from(seats).find(s => s.dataset.row === bs.row && parseInt(s.dataset.seatNumber) === parseInt(bs.seat_number));
+          if (seatEl) {
+            seatEl.classList.add('booked');
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching booked seats:', err);
+    }
+  }
+
+  // ---- Check for redirected ticket info ----
+  async function checkForRedirectedTicket() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showTicket = urlParams.get('show_ticket');
+    const bookingId = urlParams.get('booking_id');
+
+    if (showTicket === '1' && bookingId) {
+      try {
+        const response = await fetch(`get_booking_details.php?booking_id=${bookingId}`);
+        const data = await response.json();
+        if (data.success && data.booking) {
+          selectedSeats = data.booking.seats;
+          selectedDate = data.booking.date;
+          selectedTime = data.booking.time;
+          activeBarcodeValue = data.booking.barcode;
+
+          renderTicket();
+          showScreen('ticket');
+        }
+      } catch (err) {
+        console.error('Error loading booking details:', err);
+      }
+    }
+  }
+
 });

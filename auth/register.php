@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO users (name, username, email, password_hash, role) VALUES (?, ?, ?, ?, 'customer')");
             $stmt->execute([$name, $username, $email, $hashedPassword]);
-            header("Location: /login/login.html?registered=1");
+            header("Location: ../login/login.php?registered=1");
             exit;
         }
     } else {
@@ -44,6 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="password" name="password" placeholder="Password" required><br><br>
         <button type="submit">Register</button>
     </form>
-    <p>Already have an account? <a href="/login/login.html">Login</a></p>
+    <p>Already have an account? <a href="../login/login.php">Login</a></p>
 </body>
 </html>
