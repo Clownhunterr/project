@@ -62,7 +62,7 @@ function updateMovie(item) {
 
 function toggleNotify(button) {
     if (typeof CINEBOOKING_LOGGED_IN !== 'undefined' && !CINEBOOKING_LOGGED_IN) {
-        window.location.href = '/login/login.html';
+        window.location.href = 'login/login.php';
         return;
     }
 
