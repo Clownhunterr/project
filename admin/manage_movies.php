@@ -60,6 +60,7 @@ $movies = $pdo->query("SELECT * FROM movies ORDER BY movie_id DESC")->fetchAll()
                             <th>Duration</th>
                             <th>Release Date</th>
                             <th>Status</th>
+                            <th>Carousel</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -80,6 +81,13 @@ $movies = $pdo->query("SELECT * FROM movies ORDER BY movie_id DESC")->fetchAll()
                                 </td>
                                 <td>
                                     <?php echo $movie['status'] === 'now_showing' ? 'Now Showing' : 'Coming Soon'; ?>
+                                </td>
+                                <td>
+                                    <?php if (!empty($movie['is_featured'])): ?>
+                                        <span class="role-badge role-admin">Featured</span>
+                                    <?php else: ?>
+                                        <span style="color: rgba(255,255,255,0.4);">—</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="action-group">

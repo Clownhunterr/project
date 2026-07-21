@@ -343,8 +343,7 @@ header {
     margin-bottom: 12px;
 }
 
-.btn-book,
-.btn-notify {
+.btn-book, .btn-notify {
     display: inline-block;
     padding: 8px 18px;
     background: var(--primary);
@@ -358,9 +357,18 @@ header {
     transition: 0.3s;
 }
 
-.btn-book:hover,
-.btn-notify:hover {
+.btn-book:hover, .btn-notify:hover {
     background: #cc2c00;
+}
+
+.btn-notify.notified {
+    background: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.4);
+}
+
+.btn-notify.notified:hover {
+    background: rgba(46, 204, 113, 0.25);
 }
 
 .rank {
@@ -413,17 +421,9 @@ header {
 }
 
 @keyframes heartPulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.3);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
 }
 
 .empty-state {
@@ -537,26 +537,20 @@ header {
 }
 
 @media (max-width: 900px) {
-
-    header,
-    .movie-section,
-    .site-footer {
+    header, .movie-section, .site-footer {
         padding-left: 20px;
         padding-right: 20px;
     }
-
     .banner {
         padding: 0 20px;
         flex-direction: column;
         padding-top: 120px;
         min-height: auto;
     }
-
     .carousel-box {
         min-width: 100%;
         margin-top: 30px;
     }
-
     .search {
         display: none;
     }

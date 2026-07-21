@@ -16,7 +16,6 @@ body {
     color: #ffffff;
 }
 
-/* ---------- Admin login screen ---------- */
 .admin-login-body {
     min-height: 100vh;
     display: flex;
@@ -126,7 +125,6 @@ body {
     color: var(--primary);
 }
 
-/* ---------- Admin shell (header + sidebar + main) ---------- */
 .admin-header {
     display: flex;
     justify-content: space-between;
@@ -248,7 +246,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* ---------- Stat cards ---------- */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -287,7 +284,6 @@ body {
     margin-top: 2px;
 }
 
-/* ---------- Tables ---------- */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -331,7 +327,6 @@ body {
     border-radius: 10px;
 }
 
-/* ---------- Buttons ---------- */
 .btn-admin {
     display: inline-flex;
     align-items: center;
@@ -387,7 +382,6 @@ body {
     gap: 8px;
 }
 
-/* ---------- Forms ---------- */
 .admin-form {
     max-width: 720px;
     background: rgba(255, 255, 255, 0.03);
@@ -448,6 +442,23 @@ body {
     border-radius: 6px;
     color: rgba(255, 255, 255, 0.7);
     font-size: 13px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #ffffff;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
 }
 
 .current-file-note {

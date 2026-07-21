@@ -9,7 +9,7 @@ function handleUpload($file, $webFolder, $allowedExts)
     }
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExts, true)) {
-        return false; // signals an invalid file type
+        return false;
     }
     $diskFolder = '../' . $webFolder;
     if (!is_dir($diskFolder)) {
@@ -17,7 +17,7 @@ function handleUpload($file, $webFolder, $allowedExts)
     }
     $filename = uniqid('movie_', true) . '.' . $ext;
     move_uploaded_file($file['tmp_name'], $diskFolder . $filename);
-    return $webFolder . $filename; // root-relative path, stored in DB
+    return $webFolder . $filename;
 }
 
 $isEdit = isset($_GET['id']);
@@ -32,7 +32,8 @@ $movie = [
     'backdrop_url' => '',
     'trailer_url' => '',
     'release_date' => '',
-    'status' => 'now_showing'
+    'status' => 'now_showing',
+    'is_featured' => 0
 ];
 
 if ($isEdit) {
@@ -56,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = trim($_POST['description'] ?? '');
     $releaseDate = $_POST['release_date'] ?? null;
     $status = ($_POST['status'] ?? 'now_showing') === 'coming_soon' ? 'coming_soon' : 'now_showing';
+    $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
 
     $posterUrl = $movie['poster_url'];
     $backdropUrl = $movie['backdrop_url'];
@@ -85,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("
                 UPDATE movies
                 SET title=?, genre=?, age_rating=?, duration_minutes=?, description=?,
-                    poster_url=?, backdrop_url=?, trailer_url=?, release_date=?, status=?
+                    poster_url=?, backdrop_url=?, trailer_url=?, release_date=?, status=?, is_featured=?
                 WHERE movie_id=?
             ");
             $stmt->execute([
@@ -99,12 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $trailerUrl,
                 $releaseDate,
                 $status,
+                $isFeatured,
                 $movie['movie_id']
             ]);
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO movies (title, genre, age_rating, duration_minutes, description, poster_url, backdrop_url, trailer_url, release_date, status)
-                VALUES (?,?,?,?,?,?,?,?,?,?)
+                INSERT INTO movies (title, genre, age_rating, duration_minutes, description, poster_url, backdrop_url, trailer_url, release_date, status, is_featured)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?)
             ");
             $stmt->execute([
                 $title,
@@ -116,14 +119,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $backdropUrl,
                 $trailerUrl,
                 $releaseDate,
-                $status
+                $status,
+                $isFeatured
             ]);
         }
         header("Location: manage_movies.php");
         exit;
     }
 
-    // Keep whatever the admin typed on screen if validation failed, so nothing is lost
     $movie['title'] = $title;
     $movie['genre'] = $genre;
     $movie['age_rating'] = $ageRating;
@@ -131,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $movie['description'] = $description;
     $movie['release_date'] = $releaseDate;
     $movie['status'] = $status;
+    $movie['is_featured'] = $isFeatured;
 }
 ?>
 <!DOCTYPE html>
@@ -201,6 +205,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="coming_soon" <?php echo $movie['status'] === 'coming_soon' ? 'selected' : ''; ?>>Coming Soon</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_featured" value="1" <?php echo !empty($movie['is_featured']) ? 'checked' : ''; ?>>
+                        Feature in homepage carousel
+                    </label>
+                    <p class="current-file-note">Independent of Now Showing / Coming Soon — check this to add the movie to the main carousel banner.</p>
                 </div>
 
                 <div class="form-group">

@@ -91,15 +91,10 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
         </form>
 
         <?php if ($isLoggedIn): ?>
-            <div class="header-right">
-                <a href="profile/profile.php?tab=wishlist" class="mylist-btn" title="My List">
-                    <i class="fa-solid fa-heart"></i>
-                </a>
-                <a href="profile/profile.php" class="profile-btn">
-                    <i class="fa-solid fa-circle-user"></i>
-                    <?php echo htmlspecialchars($_SESSION['name']); ?>
-                </a>
-            </div>
+            <a href="profile/profile.php" class="profile-btn">
+                <i class="fa-solid fa-circle-user"></i>
+                <?php echo htmlspecialchars($_SESSION['name']); ?>
+            </a>
         <?php else: ?>
             <a href="/login/login.html" class="auth-btn">Login / Register</a>
         <?php endif; ?>

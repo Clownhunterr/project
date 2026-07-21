@@ -157,7 +157,17 @@ function getPopularMovies(PDO $pdo, $limit = 4)
 
 function getCarouselMovies(PDO $pdo, $limit = 5)
 {
-    return getNowShowing($pdo, $limit);
+    $sql = "SELECT * FROM movies WHERE is_featured = 1 ORDER BY release_date DESC";
+    if ($limit !== null) {
+        $sql .= " LIMIT " . (int) $limit;
+    }
+    $rows = $pdo->query($sql)->fetchAll();
+
+    if (count($rows) === 0) {
+        $rows = array_slice(getFallbackMovies(), 0, $limit);
+    }
+
+    return $rows;
 }
 
 function getMovieById(PDO $pdo, $movieId)
