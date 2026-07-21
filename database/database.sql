@@ -57,8 +57,14 @@ CREATE TABLE IF NOT EXISTS movies (
     genre             VARCHAR(50),
     duration_minutes  INT,
     description       TEXT,
-    poster_image      VARCHAR(255),
+    poster_url        VARCHAR(255),
+    backdrop_url      VARCHAR(255),
+    title_img         VARCHAR(255),
+    trailer_url       VARCHAR(255),
     release_year      YEAR,
+    release_date      DATE,
+    status            ENUM('now_showing', 'coming_soon', 'archived') NOT NULL DEFAULT 'now_showing',
+    is_featured       TINYINT(1) NOT NULL DEFAULT 0,
     age_rating        VARCHAR(10),
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

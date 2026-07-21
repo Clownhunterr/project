@@ -177,7 +177,13 @@ function getCarouselMovies(PDO $pdo, $limit = 5)
     if ($limit !== null) {
         $sql .= " LIMIT " . (int) $limit;
     }
-    $rows = $pdo->query($sql)->fetchAll();
+
+    try {
+        $rows = $pdo->query($sql)->fetchAll();
+    } catch (PDOException $e) {
+        // Schema doesn't have is_featured / release_date yet — fall back safely
+        $rows = [];
+    }
 
     if (count($rows) === 0) {
         $rows = array_slice(getFallbackMovies(), 0, $limit);
