@@ -75,7 +75,7 @@ function getFallbackMovies()
             'title_img' => 'img/MoonKnightPoster.jpg',
             'trailer_url' => '',
             'release_date' => '2022-01-01',
-            'status' => 'now_showing',
+            'status' => 'coming_soon',
             'is_fallback' => true,
         ],
         [
@@ -90,7 +90,7 @@ function getFallbackMovies()
             'title_img' => 'img/money heist.jpg',
             'trailer_url' => '',
             'release_date' => '2026-09-02',
-            'status' => 'now_showing',
+            'status' => 'coming_soon',
             'is_fallback' => true,
         ],
     ];
