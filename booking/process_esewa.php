@@ -62,18 +62,12 @@ if ($bookingId) {
 
         $pdo->commit();
 
-        // Get movie_id to redirect back to booking.php
-        $stmtMovie = $pdo->prepare("SELECT st.movie_id FROM bookings b JOIN showtimes st ON b.showtime_id = st.showtime_id WHERE b.booking_id = ?");
-        $stmtMovie->execute([$bookingId]);
-        $movie = $stmtMovie->fetch();
-        $movieId = $movie ? $movie['movie_id'] : 0;
-
         // Clear session data
         unset($_SESSION['pending_booking_id_' . $uuid]);
         unset($_SESSION['pending_booking_seats_' . $uuid]);
 
-        // Redirect back to booking.php to show the ticket locally
-        header('Location: booking.php?id=' . $movieId . '&show_ticket=1&booking_id=' . $bookingId);
+        // Redirect to the dedicated ticket view page (same as simulation payment)
+        header('Location: view_ticket.php?booking_id=' . $bookingId);
         exit;
 
     } catch (Exception $e) {
