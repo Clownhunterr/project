@@ -56,9 +56,9 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                     <?php echo $inWishlist ? 'Notified ✓' : 'Notify Me'; ?>
                 </button>
             <?php elseif ($isNotify): ?>
-                <a href="<?php echo $isFallback ? '/login/login.html' : '#'; ?>" class="btn-notify"><?php echo htmlspecialchars($buttonLabel); ?></a>
+                <a href="login/login.php" class="btn-notify"><?php echo htmlspecialchars($buttonLabel); ?></a>
             <?php else: ?>
-                <a href="<?php echo $isFallback ? '#' : 'booking/booking.php?id=' . (int)$movie['movie_id']; ?>" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
+                <a href="booking/booking.php?id=<?php echo (int)$movie['movie_id']; ?>" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
             <?php endif; ?>
         </div>
     </div>
@@ -217,7 +217,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
                             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
                             </p>
-                            <a href="<?php echo $isFallback ? '#' : 'booking/booking.php?id=' . (int)$movie['movie_id']; ?>" class="btn-book">Book Ticket</a>
+                            <a href="booking/booking.php?id=<?php echo (int)$movie['movie_id']; ?>" class="btn-book">Book Ticket</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
