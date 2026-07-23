@@ -12,7 +12,7 @@ if ($searchQuery !== '') {
     $searchResults = searchMovies($pdo, $searchQuery);
 }
 
-$carouselMovies = getCarouselMovies($pdo, 5);
+$carouselMovies = getCarouselMovies($pdo, null);
 $nowShowing = getNowShowing($pdo, 8);
 $comingSoon = getComingSoon($pdo, 8);
 $popularMovies = getPopularMovies($pdo, 4);

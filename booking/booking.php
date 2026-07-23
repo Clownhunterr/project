@@ -212,7 +212,7 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <div style="width:100%;height:200px;background:#2e3037;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:13px;">No Poster</div>
             <?php endif; ?>
 
-            <div class="play">
+            <div class="play" id="playTrailerBtn">
                 <i class="bi bi-play-fill"></i>
             </div>
 
@@ -301,11 +301,17 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <?php
                 $rowLabels = ['A','B','C','D','E','F','G','H'];
                 foreach ($rowLabels as $rowLabel):
+                    $price = 560; // Premium
+                    if (in_array($rowLabel, ['A', 'B', 'C'])) {
+                        $price = 250; // Front
+                    } elseif (in_array($rowLabel, ['D', 'E', 'F'])) {
+                        $price = 400; // Middle
+                    }
                 ?>
                 <div class="row">
                     <span><?php echo $rowLabel; ?></span>
                     <?php for ($s = 1; $s <= 23; $s++): ?>
-                        <li class="seat">560</li>
+                        <li class="seat" data-price="<?php echo $price; ?>"><?php echo $price; ?></li>
                     <?php endfor; ?>
                     <span><?php echo $rowLabel; ?></span>
                 </div>

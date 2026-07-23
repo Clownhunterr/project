@@ -109,7 +109,18 @@ try {
         exit;
     }
 
-    $totalAmount = count($seats) * 560; 
+    // Calculate total amount based on seat rows
+    $totalAmount = 0;
+    foreach ($seats as $s) {
+        $row = $s['row'];
+        if (in_array($row, ['A', 'B', 'C'])) {
+            $totalAmount += 250;
+        } elseif (in_array($row, ['D', 'E', 'F'])) {
+            $totalAmount += 400;
+        } else {
+            $totalAmount += 560;
+        }
+    }
     $uuid = 'SIM' . time() . rand(1000, 9999);
     
     // Create the confirmed booking instantly

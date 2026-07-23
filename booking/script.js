@@ -61,7 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentScreen = 'booking';
 
-  const PRICE_PER_SEAT = 560;
+  function getSeatPrice(row) {
+    if (['A', 'B', 'C'].includes(row)) return 250;
+    if (['D', 'E', 'F'].includes(row)) return 400;
+    return 560;
+  }
 
   let selectedSeats = [];
   let selectedDate  = null;
@@ -195,9 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const seatLabels = selectedSeats
       .map(s => `${s.row}${s.seatNumber}`)
       .join(', ');
-    const total = selectedSeats.length * PRICE_PER_SEAT;
+    const total = selectedSeats.reduce((sum, s) => sum + getSeatPrice(s.row), 0);
 
-    summaryEl.textContent = `Seats: ${seatLabels} — Total: ${total}`;
+    summaryEl.textContent = `Seats: ${seatLabels} — Total: Rs. ${total}`;
   }
 
   /* ---------- 9. Payment screen (eSewa) ---------- */
@@ -365,8 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (paymentTotal) {
-      const total = selectedSeats.length * PRICE_PER_SEAT;
-      paymentTotal.textContent = `${selectedSeats.length} seat(s) — Total: ${total}`;
+      const total = selectedSeats.reduce((sum, s) => sum + getSeatPrice(s.row), 0);
+      paymentTotal.textContent = `${selectedSeats.length} seat(s) — Total: Rs. ${total}`;
     }
 
     showScreen('payment');
@@ -407,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const rows = [...new Set(group.map(s => s.row))].join(', ');
       const seatNums = group.map(s => s.seatNumber).join(', ');
-      const total = group.length * PRICE_PER_SEAT;
+      const total = group.reduce((sum, s) => sum + getSeatPrice(s.row), 0);
 
       const cards = ticEl.querySelectorAll('.barcode .card h6');
       if (cards.length >= 4) {

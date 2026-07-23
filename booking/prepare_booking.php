@@ -116,8 +116,19 @@ try {
         exit;
     }
 
-    // Create the pending booking
-    $totalAmount = count($seats) * 560; // 560 per seat
+    // Calculate total amount based on seat rows
+    $totalAmount = 0;
+    foreach ($seats as $s) {
+        $row = $s['row'];
+        if (in_array($row, ['A', 'B', 'C'])) {
+            $totalAmount += 250;
+        } elseif (in_array($row, ['D', 'E', 'F'])) {
+            $totalAmount += 400;
+        } else {
+            $totalAmount += 560;
+        }
+    }
+    
     $uuid = 'CB' . time() . rand(1000, 9999); // transaction_uuid
     
     $stmtBooking = $pdo->prepare("INSERT INTO bookings (user_id, showtime_id, barcode_value, total_amount, status) VALUES (?, ?, ?, ?, 'pending')");
