@@ -1,7 +1,7 @@
 <?php
 $host = getenv('MYSQLHOST') ?: 'localhost';
 $port = getenv('MYSQLPORT') ?: '3306';
-$dbname = getenv('MYSQLDATABASE') ?: 'movie_ticket_db';
+$dbname = 'movie_ticket_db'; // hardcoded: this is where the schema/tables actually live, not Railway's default "railway" database
 $username = getenv('MYSQLUSER') ?: 'root';
 $password = getenv('MYSQLPASSWORD') ?: '';
 
