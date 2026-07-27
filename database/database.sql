@@ -52,13 +52,25 @@ ON DUPLICATE KEY UPDATE username = username;
 -- Movies
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies (
-    movie_id         INT AUTO_INCREMENT PRIMARY KEY,
+    movie_id          INT AUTO_INCREMENT PRIMARY KEY,
     title             VARCHAR(150) NOT NULL,
     genre             VARCHAR(50),
     duration_minutes  INT,
     description       TEXT,
-    poster_image      VARCHAR(255),
+    director          VARCHAR(150),
+    producer          VARCHAR(150),
+    actors            VARCHAR(255),
+    poster_url        VARCHAR(255),
+    backdrop_url      VARCHAR(255),
+    title_img         VARCHAR(255),
+    trailer_url       VARCHAR(255),
     release_year      YEAR,
+    release_date      DATE,
+    ticket_start_date DATE,
+    ticket_end_date   DATE,
+    status            ENUM('now_showing','coming_soon','archived') NOT NULL DEFAULT 'now_showing',
+    is_featured       TINYINT(1) NOT NULL DEFAULT 0,
+    featured_at       TIMESTAMP NULL,
     age_rating        VARCHAR(10),
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -136,4 +148,19 @@ CREATE TABLE IF NOT EXISTS wishlist (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE,
     UNIQUE KEY unique_wish (user_id, movie_id)
+);
+
+-- ---------------------------------------------------------------------
+-- Notifications
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS notifications (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id         INT NOT NULL,
+    movie_id        INT DEFAULT NULL,
+    title           VARCHAR(150) NOT NULL,
+    message         TEXT NOT NULL,
+    is_read         TINYINT(1) NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE
 );

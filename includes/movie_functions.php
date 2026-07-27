@@ -173,16 +173,28 @@ function getPopularMovies(PDO $pdo, $limit = 4)
 
 function getCarouselMovies(PDO $pdo, $limit = 5)
 {
-    $sql = "SELECT * FROM movies WHERE is_featured = 1 ORDER BY release_date DESC";
-    if ($limit !== null) {
-        $sql .= " LIMIT " . (int) $limit;
-    }
+    $limit = $limit ?: 5;
+    $sql = "SELECT * FROM movies WHERE is_featured = 1 ORDER BY featured_at DESC, movie_id DESC LIMIT " . (int) $limit;
 
     try {
         $rows = $pdo->query($sql)->fetchAll();
     } catch (PDOException $e) {
-        // Schema doesn't have is_featured / release_date yet — fall back safely
         $rows = [];
+    }
+
+    // Pad with active 'now_showing' movies if we don't have enough featured ones
+    if (count($rows) < $limit) {
+        $padLimit = $limit - count($rows);
+        $excludeIds = empty($rows) ? [0] : array_column($rows, 'movie_id');
+        $inClause = implode(',', array_map('intval', $excludeIds));
+        
+        try {
+            $padSql = "SELECT * FROM movies WHERE status = 'now_showing' AND movie_id NOT IN ($inClause) ORDER BY release_date DESC LIMIT $padLimit";
+            $padRows = $pdo->query($padSql)->fetchAll();
+            $rows = array_merge($rows, $padRows);
+        } catch (PDOException $e) {
+            // Ignore if schema not fully ready
+        }
     }
 
     if (count($rows) === 0) {

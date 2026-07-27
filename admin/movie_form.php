@@ -28,12 +28,18 @@ $movie = [
     'age_rating' => '',
     'duration_minutes' => '',
     'description' => '',
+    'director' => '',
+    'producer' => '',
+    'actors' => '',
     'poster_url' => '',
     'backdrop_url' => '',
     'trailer_url' => '',
     'release_date' => '',
+    'ticket_start_date' => '',
+    'ticket_end_date' => '',
     'status' => 'now_showing',
-    'is_featured' => 0
+    'is_featured' => 0,
+    'featured_at' => null
 ];
 
 if ($isEdit) {
@@ -55,9 +61,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ageRating = trim($_POST['age_rating'] ?? '');
     $duration = (int) ($_POST['duration_minutes'] ?? 0);
     $description = trim($_POST['description'] ?? '');
-    $releaseDate = $_POST['release_date'] ?? null;
+    $director = trim($_POST['director'] ?? '');
+    $producer = trim($_POST['producer'] ?? '');
+    $actors = trim($_POST['actors'] ?? '');
+    $releaseDate = !empty($_POST['release_date']) ? $_POST['release_date'] : null;
+    $ticketStartDate = !empty($_POST['ticket_start_date']) ? $_POST['ticket_start_date'] : null;
+    $ticketEndDate = !empty($_POST['ticket_end_date']) ? $_POST['ticket_end_date'] : null;
     $status = ($_POST['status'] ?? 'now_showing') === 'coming_soon' ? 'coming_soon' : 'now_showing';
     $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
+
+    // FIFO Carousel Queue Management:
+    // If set to featured, assign current timestamp and unfeature oldest if capacity (5) reached.
+    $featuredAt = $movie['featured_at'];
+    if ($isFeatured) {
+        if (empty($featuredAt) || !$movie['is_featured']) {
+            $featuredAt = date('Y-m-d H:i:s');
+        }
+        $excludeId = $isEdit ? (int)$movie['movie_id'] : 0;
+        $countStmt = $pdo->prepare("SELECT movie_id FROM movies WHERE is_featured = 1 AND movie_id != ? ORDER BY featured_at ASC, movie_id ASC");
+        $countStmt->execute([$excludeId]);
+        $currentlyFeatured = $countStmt->fetchAll(PDO::FETCH_COLUMN);
+
+        if (count($currentlyFeatured) >= 5) {
+            $toUnfeatureCount = count($currentlyFeatured) - 4;
+            $toUnfeature = array_slice($currentlyFeatured, 0, $toUnfeatureCount);
+            if (!empty($toUnfeature)) {
+                $inClause = implode(',', array_map('intval', $toUnfeature));
+                $pdo->exec("UPDATE movies SET is_featured = 0 WHERE movie_id IN ($inClause)");
+            }
+        }
+    } else {
+        $featuredAt = null;
+    }
 
     $posterUrl = $movie['poster_url'];
     $backdropUrl = $movie['backdrop_url'];
@@ -65,14 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $posterResult = handleUpload($_FILES['poster'] ?? [], 'uploads/posters/', ['jpg', 'jpeg', 'png', 'webp']);
     $backdropResult = handleUpload($_FILES['backdrop'] ?? [], 'uploads/backdrops/', ['jpg', 'jpeg', 'png', 'webp']);
-    $trailerResult = handleUpload($_FILES['trailer'] ?? [], 'uploads/trailers/', ['mp4', 'webm', 'mov']);
+    $trailerUrl = trim($_POST['trailer_url'] ?? $movie['trailer_url']);
 
     if ($posterResult === false) {
         $error = "Poster must be a JPG, PNG, or WEBP image.";
     } elseif ($backdropResult === false) {
         $error = "Background image must be a JPG, PNG, or WEBP image.";
-    } elseif ($trailerResult === false) {
-        $error = "Trailer must be an MP4, WEBM, or MOV file.";
     } elseif ($title === '') {
         $error = "Title is required.";
     } else {
@@ -80,14 +113,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $posterUrl = $posterResult;
         if ($backdropResult)
             $backdropUrl = $backdropResult;
-        if ($trailerResult)
-            $trailerUrl = $trailerResult;
 
         if ($isEdit) {
             $stmt = $pdo->prepare("
                 UPDATE movies
                 SET title=?, genre=?, age_rating=?, duration_minutes=?, description=?,
-                    poster_url=?, backdrop_url=?, trailer_url=?, release_date=?, status=?, is_featured=?
+                    director=?, producer=?, actors=?,
+                    poster_url=?, backdrop_url=?, trailer_url=?,
+                    release_date=?, ticket_start_date=?, ticket_end_date=?,
+                    status=?, is_featured=?, featured_at=?
                 WHERE movie_id=?
             ");
             $stmt->execute([
@@ -96,18 +130,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ageRating,
                 $duration,
                 $description,
+                $director,
+                $producer,
+                $actors,
                 $posterUrl,
                 $backdropUrl,
                 $trailerUrl,
                 $releaseDate,
+                $ticketStartDate,
+                $ticketEndDate,
                 $status,
                 $isFeatured,
+                $featuredAt,
                 $movie['movie_id']
             ]);
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO movies (title, genre, age_rating, duration_minutes, description, poster_url, backdrop_url, trailer_url, release_date, status, is_featured)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                INSERT INTO movies (title, genre, age_rating, duration_minutes, description, director, producer, actors, poster_url, backdrop_url, trailer_url, release_date, ticket_start_date, ticket_end_date, status, is_featured, featured_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ");
             $stmt->execute([
                 $title,
@@ -115,12 +155,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ageRating,
                 $duration,
                 $description,
+                $director,
+                $producer,
+                $actors,
                 $posterUrl,
                 $backdropUrl,
                 $trailerUrl,
                 $releaseDate,
+                $ticketStartDate,
+                $ticketEndDate,
                 $status,
-                $isFeatured
+                $isFeatured,
+                $featuredAt
             ]);
         }
         header("Location: manage_movies.php");
@@ -132,7 +178,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $movie['age_rating'] = $ageRating;
     $movie['duration_minutes'] = $duration;
     $movie['description'] = $description;
+    $movie['director'] = $director;
+    $movie['producer'] = $producer;
+    $movie['actors'] = $actors;
     $movie['release_date'] = $releaseDate;
+    $movie['ticket_start_date'] = $ticketStartDate;
+    $movie['ticket_end_date'] = $ticketEndDate;
     $movie['status'] = $status;
     $movie['is_featured'] = $isFeatured;
 }
@@ -194,6 +245,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label>Director</label>
+                        <input type="text" name="director" value="<?php echo htmlspecialchars($movie['director']); ?>" placeholder="Director Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Producer</label>
+                        <input type="text" name="producer" value="<?php echo htmlspecialchars($movie['producer']); ?>" placeholder="Producer Name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cast / Actors</label>
+                    <input type="text" name="actors" value="<?php echo htmlspecialchars($movie['actors']); ?>" placeholder="e.g. Tom Holland, Zendaya, Jacob Batalon">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ticket Sales Start Date</label>
+                        <input type="date" name="ticket_start_date" value="<?php echo htmlspecialchars($movie['ticket_start_date'] ?? ''); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>Ticket Sales End Date</label>
+                        <input type="date" name="ticket_end_date" value="<?php echo htmlspecialchars($movie['ticket_end_date'] ?? ''); ?>">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
                         <label>Release Date</label>
                         <input type="date" name="release_date"
                             value="<?php echo htmlspecialchars($movie['release_date']); ?>">
@@ -210,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-group">
                     <label class="checkbox-label">
                         <input type="checkbox" name="is_featured" value="1" <?php echo !empty($movie['is_featured']) ? 'checked' : ''; ?>>
-                        Feature in homepage carousel
+                        Feature in homepage carousel (Max 5 items, oldest rotates out)
                     </label>
                     <p class="current-file-note">Independent of Now Showing / Coming Soon — check this to add the movie to the main carousel banner.</p>
                 </div>
@@ -219,7 +297,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label>Synopsis / Description</label>
                     <textarea name="description"><?php echo htmlspecialchars($movie['description']); ?></textarea>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label>Poster Image</label>
@@ -239,11 +316,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label>Trailer (local video file)</label>
-                    <input type="file" name="trailer" accept=".mp4,.webm,.mov">
-                    <?php if ($movie['trailer_url']): ?>
-                        <p class="current-file-note">Current: <?php echo htmlspecialchars($movie['trailer_url']); ?></p>
-                    <?php endif; ?>
+                    <label>Trailer Link (URL)</label>
+                    <input type="url" name="trailer_url" value="<?php echo htmlspecialchars($movie['trailer_url'] ?? ''); ?>" placeholder="https://www.youtube.com/watch?v=...">
                 </div>
 
                 <div class="form-actions">

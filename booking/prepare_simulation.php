@@ -43,7 +43,7 @@ try {
             }
         }
         if ($fallback) {
-            $stmt = $pdo->prepare("INSERT INTO movies (movie_id, title, genre, duration_minutes, poster_image) VALUES (?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO movies (movie_id, title, genre, duration_minutes, poster_url) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$movieId, $fallback['title'], $fallback['genre'], $fallback['duration_minutes'], $fallback['poster_url']]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Invalid movie']);

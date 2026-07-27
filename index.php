@@ -155,7 +155,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                         <?php foreach ($carouselMovies as $movie):
                             $titleImg = $movie['title_img'] ?? $movie['poster_url'];
                             ?>
-                            <div class="carousel-item" data-movie-id="<?php echo (int) $movie['movie_id']; ?>"
+                                <div class="carousel-item" data-movie-id="<?php echo (int) $movie['movie_id']; ?>"
                                 data-bg="<?php echo htmlspecialchars($movie['backdrop_url'] ?: $movie['poster_url']); ?>"
                                 data-title-img="<?php echo htmlspecialchars($titleImg); ?>"
                                 data-year="<?php echo $movie['release_date'] ? date('Y', strtotime($movie['release_date'])) : ''; ?>"
@@ -163,6 +163,9 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                                 data-duration="<?php echo formatDuration($movie['duration_minutes']); ?>"
                                 data-genre="<?php echo htmlspecialchars($movie['genre']); ?>"
                                 data-desc="<?php echo htmlspecialchars($movie['description']); ?>"
+                                data-director="<?php echo htmlspecialchars($movie['director'] ?? ''); ?>"
+                                data-producer="<?php echo htmlspecialchars($movie['producer'] ?? ''); ?>"
+                                data-actors="<?php echo htmlspecialchars($movie['actors'] ?? ''); ?>"
                                 data-trailer="<?php echo htmlspecialchars($movie['trailer_url']); ?>"
                                 data-status="<?php echo htmlspecialchars($movie['status']); ?>">
                                 <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'database/db.php';
 require 'includes/movie_functions.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
@@ -97,7 +97,28 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
                     <?php endif; ?>
                 </div>
 
-                <p class="movie-desc"><?php echo htmlspecialchars($movie['description']); ?></p>
+
+                
+                <div class="movie-crew" style="margin: 15px 0; font-size: 0.95rem; color: #ccc;">
+                    <?php if (!empty($movie['director'])): ?>
+                        <p style="margin-bottom: 5px;"><strong>Director:</strong> <?php echo htmlspecialchars($movie['director']); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['producer'])): ?>
+                        <p style="margin-bottom: 5px;"><strong>Producer:</strong> <?php echo htmlspecialchars($movie['producer']); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['actors'])): ?>
+                        <p style="margin-bottom: 5px;"><strong>Cast:</strong> <?php echo htmlspecialchars($movie['actors']); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['ticket_start_date']) || !empty($movie['ticket_end_date'])): ?>
+                        <p style="margin-top: 10px; color: var(--primary);">
+                            <i class="fa-solid fa-calendar-alt"></i> 
+                            Tickets Available: 
+                            <?php echo $movie['ticket_start_date'] ? date('M j, Y', strtotime($movie['ticket_start_date'])) : 'Now'; ?> 
+                            - 
+                            <?php echo $movie['ticket_end_date'] ? date('M j, Y', strtotime($movie['ticket_end_date'])) : 'Until closed'; ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
 
                 <div class="movie-actions">
                     <?php if (!empty($movie['trailer_url'])): ?>
@@ -162,11 +183,17 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
         const CINEBOOKING_LOGGED_IN = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
 
         function playTrailer(src) {
+            if (src.startsWith('http://') || src.startsWith('https://')) {
+                window.open(src, '_blank');
+                return;
+            }
             const overlay = document.getElementById('trailerOverlay');
             const video = document.getElementById('trailerVideo');
-            video.src = src;
-            overlay.classList.add('active');
-            video.play();
+            if (video && overlay) {
+                video.src = src;
+                overlay.classList.add('active');
+                video.play();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {

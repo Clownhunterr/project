@@ -220,10 +220,18 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <span class="genre-badge"><?php echo $genre; ?></span>
             <?php endif; ?>
 
-            <div class="cont">
-                <?php if ($description): ?>
-                    <p class="movie-desc"><?php echo $description; ?></p>
-                <?php endif; ?>
+            <div class="cont" style="padding: 0 20px 20px;">
+                <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.6;">
+                    <?php if (!empty($movie['director'])): ?>
+                        <div><strong>Director:</strong> <?php echo htmlspecialchars($movie['director']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['producer'])): ?>
+                        <div><strong>Producer:</strong> <?php echo htmlspecialchars($movie['producer']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['actors'])): ?>
+                        <div style="margin-top: 5px;"><strong>Cast:</strong> <?php echo htmlspecialchars($movie['actors']); ?></div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 

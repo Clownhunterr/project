@@ -68,6 +68,21 @@ try {
 } catch (PDOException $e) {
     $wishlistReady = false;
 }
+
+$notifications = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT n.*, m.title as movie_title, m.poster_url 
+        FROM notifications n
+        JOIN movies m ON n.movie_id = m.movie_id
+        WHERE n.user_id = ?
+        ORDER BY n.created_at DESC
+    ");
+    $stmt->execute([$userId]);
+    $notifications = $stmt->fetchAll();
+} catch (PDOException $e) {
+    // schema not ready yet
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -110,6 +125,9 @@ try {
                 </button>
                 <button class="nav-item" data-tab="wishlist">
                     <i class="fa-solid fa-heart"></i> Wishlist
+                </button>
+                <button class="nav-item" data-tab="notifications">
+                    <i class="fa-solid fa-bell"></i> Notifications
                 </button>
                 <a href="logout.php" class="nav-item sign-out"
                     onclick="return confirm('Are you sure you want to sign out?');">
@@ -207,18 +225,45 @@ try {
                     <div class="wishlist-grid">
                         <?php foreach ($wishlist as $item): ?>
                             <div class="wishlist-card">
-                                <img src="../<?php echo htmlspecialchars($item['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
-                                    alt="<?php echo htmlspecialchars($item['title']); ?>" />
+                                <a href="../movie.php?id=<?php echo $item['movie_id']; ?>">
+                                    <img src="../<?php echo htmlspecialchars($item['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
+                                        alt="<?php echo htmlspecialchars($item['title']); ?>" />
+                                </a>
                                 <div class="wishlist-card-info">
-                                    <h3><?php echo htmlspecialchars($item['title']); ?></h3>
+                                    <h3><a href="../movie.php?id=<?php echo $item['movie_id']; ?>" style="color:white;text-decoration:none;"><?php echo htmlspecialchars($item['title']); ?></a></h3>
                                     <p><?php echo htmlspecialchars($item['genre']); ?><?php echo $item['duration_minutes'] ? ' • ' . formatDuration($item['duration_minutes']) : ''; ?>
                                     </p>
+                                    <button class="btn-primary" style="margin-top:10px; font-size:12px; padding: 5px 10px;" onclick="removeFromWishlist(<?php echo $item['movie_id']; ?>)">Remove</button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </section>
+
+            <section class="tab-panel" id="tab-notifications">
+                <h2>Notifications</h2>
+                <?php if (count($notifications) === 0): ?>
+                    <div class="empty-state">
+                        <i class="fa-solid fa-bell-slash"></i>
+                        <p>No notifications yet.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="notifications-list">
+                        <?php foreach ($notifications as $note): ?>
+                            <div class="notification-item <?php echo $note['is_read'] ? 'read' : 'unread'; ?>" style="background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; gap: 15px;">
+                                <img src="../<?php echo htmlspecialchars($note['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>" style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px;" />
+                                <div>
+                                    <h4 style="margin-bottom: 5px; color: var(--primary);"><?php echo htmlspecialchars($note['title']); ?></h4>
+                                    <p style="font-size: 0.9rem; color: #ccc;"><?php echo htmlspecialchars($note['message']); ?></p>
+                                    <small style="color: #888;"><?php echo date('M j, Y h:i A', strtotime($note['created_at'])); ?></small>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+
 
         </main>
     </div>

@@ -2,21 +2,32 @@ let currentTrailer = "";
 
 function openTrailer() {
     if (!currentTrailer) return;
+    
+    // Check if it's an external URL (http/https)
+    if (currentTrailer.startsWith('http://') || currentTrailer.startsWith('https://')) {
+        window.open(currentTrailer, '_blank');
+        return;
+    }
+    
     const overlay = document.getElementById('trailerOverlay');
     const video = document.getElementById('trailerVideo');
-    video.src = currentTrailer;
-    overlay.classList.add('active');
-    video.play();
+    if (video && overlay) {
+        video.src = currentTrailer;
+        overlay.classList.add('active');
+        video.play();
+    }
 }
 
 function closeTrailer() {
     const overlay = document.getElementById('trailerOverlay');
     const video = document.getElementById('trailerVideo');
-    video.pause();
-    video.currentTime = 0;
-    video.removeAttribute('src');
-    video.load();
-    overlay.classList.remove('active');
+    if (video && overlay) {
+        video.pause();
+        video.currentTime = 0;
+        video.removeAttribute('src');
+        video.load();
+        overlay.classList.remove('active');
+    }
 }
 
 function updateMovie(item) {
@@ -68,7 +79,7 @@ function toggleNotify(button) {
 
     const movieId = button.dataset.movieId;
 
-    fetch('wishlist_toggle.php', {
+    fetch('notify_toggle.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `movie_id=${encodeURIComponent(movieId)}`
