@@ -220,16 +220,16 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <span class="genre-badge"><?php echo $genre; ?></span>
             <?php endif; ?>
 
-            <div class="cont" style="padding: 0 20px 20px;">
-                <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.6;">
+            <div class="cont" style="padding: 0 20px 20px; overflow-wrap: break-word; word-wrap: break-word; hyphens: auto; font-size: 0.8rem;">
+                <div style="color: rgba(255,255,255,0.7); line-height: 1.5;">
                     <?php if (!empty($movie['director'])): ?>
                         <div><strong>Director:</strong> <?php echo htmlspecialchars($movie['director']); ?></div>
                     <?php endif; ?>
                     <?php if (!empty($movie['producer'])): ?>
-                        <div><strong>Producer:</strong> <?php echo htmlspecialchars($movie['producer']); ?></div>
+                        <div style="margin-top: 4px;"><strong>Producer:</strong> <?php echo htmlspecialchars($movie['producer']); ?></div>
                     <?php endif; ?>
                     <?php if (!empty($movie['actors'])): ?>
-                        <div style="margin-top: 5px;"><strong>Cast:</strong> <?php echo htmlspecialchars($movie['actors']); ?></div>
+                        <div style="margin-top: 4px;"><strong>Cast:</strong> <?php echo htmlspecialchars($movie['actors']); ?></div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -259,7 +259,7 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <?php
                 $backdrop = htmlspecialchars($movie['backdrop_url'] ?? $movie['poster_url'] ?? '');
                 if ($backdrop): ?>
-                    <style>.book .right::before { background-image: url(../<?php echo $backdrop; ?>); }</style>
+                    <style>.book .right::before { background-image: url('../<?php echo $backdrop; ?>') !important; }</style>
                 <?php endif; ?>
             <?php endif; ?>
 
