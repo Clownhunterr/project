@@ -70,7 +70,8 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
 
     <div class="trailer" id="trailerOverlay">
         <div class="video-wrapper">
-            <video id="trailerVideo" controls></video>
+            <video id="trailerVideo" controls style="display:none;"></video>
+            <iframe id="trailerIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="display:none; width:100%; height:100%;"></iframe>
         </div>
     </div>
 
@@ -183,13 +184,38 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
         const CINEBOOKING_LOGGED_IN = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
 
         function playTrailer(src) {
-            if (src.startsWith('http://') || src.startsWith('https://')) {
-                window.open(src, '_blank');
-                return;
-            }
             const overlay = document.getElementById('trailerOverlay');
             const video = document.getElementById('trailerVideo');
+            const iframe = document.getElementById('trailerIframe');
+            
+            // Check if it's a YouTube URL
+            if (src.includes('youtube.com') || src.includes('youtu.be')) {
+                let videoId = "";
+                if (src.includes('youtube.com/watch?v=')) {
+                    videoId = src.split('v=')[1].split('&')[0];
+                } else if (src.includes('youtu.be/')) {
+                    videoId = src.split('youtu.be/')[1].split('?')[0];
+                }
+                
+                if (videoId && iframe && overlay) {
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    iframe.style.display = 'block';
+                    if (video) video.style.display = 'none';
+                    overlay.classList.add('active');
+                    return;
+                }
+            }
+            
+            if (src.startsWith('http://') || src.startsWith('https://')) {
+                if (!src.endsWith('.mp4') && !src.endsWith('.webm')) {
+                    window.open(src, '_blank');
+                    return;
+                }
+            }
+            
             if (video && overlay) {
+                if (iframe) iframe.style.display = 'none';
+                video.style.display = 'block';
                 video.src = src;
                 overlay.classList.add('active');
                 video.play();
@@ -198,17 +224,27 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
 
         document.addEventListener('DOMContentLoaded', function () {
             const trailerOverlay = document.getElementById('trailerOverlay');
-            trailerOverlay.addEventListener('click', function () {
-                const video = document.getElementById('trailerVideo');
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
-                trailerOverlay.classList.remove('active');
-            });
-            document.querySelector('.video-wrapper').addEventListener('click', e => e.stopPropagation());
+            if (trailerOverlay) {
+                trailerOverlay.addEventListener('click', function () {
+                    const video = document.getElementById('trailerVideo');
+                    const iframe = document.getElementById('trailerIframe');
+                    if (iframe) {
+                        iframe.src = '';
+                        iframe.style.display = 'none';
+                    }
+                    if (video) {
+                        video.pause();
+                        video.removeAttribute('src');
+                        video.load();
+                        video.style.display = 'none';
+                    }
+                    trailerOverlay.classList.remove('active');
+                });
+            }
+            document.querySelector('.video-wrapper')?.addEventListener('click', e => e.stopPropagation());
         });
     </script>
-    <script src="home.js"></script>
+    <script src="home.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

@@ -101,7 +101,8 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
 
     <div class="trailer" id="trailerOverlay">
         <div class="video-wrapper">
-            <video id="trailerVideo" controls></video>
+            <video id="trailerVideo" controls style="display:none;"></video>
+            <iframe id="trailerIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="display:none; width:100%; height:100%;"></iframe>
         </div>
     </div>
 
@@ -264,7 +265,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
     <script>
         const CINEBOOKING_LOGGED_IN = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
     </script>
-    <script src="home.js"></script>
+    <script src="home.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

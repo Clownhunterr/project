@@ -212,7 +212,7 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <div style="width:100%;height:200px;background:#2e3037;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:13px;">No Poster</div>
             <?php endif; ?>
 
-            <div class="play" id="playTrailerBtn">
+            <div class="play" id="playTrailerBtn" data-url="<?php echo htmlspecialchars($trailerUrl ?? ''); ?>">
                 <i class="bi bi-play-fill"></i>
             </div>
 
@@ -239,10 +239,23 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
         <div class="right" style="position:relative;">
 
             <!-- Background trailer video (muted, loops) -->
-            <?php if ($trailerUrl): ?>
-                <video src="../<?php echo $trailerUrl; ?>" id="bgVideo" autoplay muted loop playsinline></video>
+            <?php 
+            $isExternal = false;
+            $videoSrc = '';
+            if ($trailerUrl) {
+                if (strpos($trailerUrl, 'http://') === 0 || strpos($trailerUrl, 'https://') === 0) {
+                    $isExternal = true;
+                    $videoSrc = $trailerUrl; // For external, we won't use it as background video, we'll use backdrop
+                } else {
+                    $videoSrc = '../' . $trailerUrl;
+                }
+            }
+            ?>
+            
+            <?php if ($trailerUrl && !$isExternal): ?>
+                <video src="<?php echo $videoSrc; ?>" id="bgVideo" autoplay muted loop playsinline></video>
             <?php else: ?>
-                <!-- No trailer — use backdrop image as CSS bg via inline style -->
+                <!-- No local trailer — use backdrop image as CSS bg via inline style -->
                 <?php
                 $backdrop = htmlspecialchars($movie['backdrop_url'] ?? $movie['poster_url'] ?? '');
                 if ($backdrop): ?>
