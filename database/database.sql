@@ -60,15 +60,15 @@ ON DUPLICATE KEY UPDATE
 -- Movies
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies (
-    movie_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(150) NOT NULL,
-    genre VARCHAR(50),
-    duration_minutes INT,
-    description TEXT,
-    poster_image VARCHAR(255),
-    release_year YEAR,
-    age_rating VARCHAR(10),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    movie_id         INT AUTO_INCREMENT PRIMARY KEY,
+    title             VARCHAR(150) NOT NULL,
+    genre             VARCHAR(50),
+    duration_minutes  INT,
+    description       TEXT,
+    poster_image      VARCHAR(255),
+    release_year      YEAR,
+    age_rating        VARCHAR(10),
+    created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ---------------------------------------------------------------------

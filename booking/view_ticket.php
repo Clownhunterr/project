@@ -25,7 +25,7 @@ try {
     $stmt = $pdo->prepare("
         SELECT b.booking_id, b.barcode_value, b.total_amount, b.status, b.user_id,
                st.show_date, st.show_time,
-               m.title, m.poster_image,
+               m.title, m.poster_url,
                h.hall_name
         FROM bookings b
         JOIN showtimes st ON b.showtime_id = st.showtime_id
@@ -77,8 +77,8 @@ if (isset($_SESSION['admin_id'])) {
 
 // Poster image path
 $posterPath = '';
-if (!empty($booking['poster_image'])) {
-    $posterPath = '../' . $booking['poster_image'];
+if (!empty($booking['poster_url'])) {
+    $posterPath = '../' . $booking['poster_url'];
 }
 ?>
 <!DOCTYPE html>

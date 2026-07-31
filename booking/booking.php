@@ -212,7 +212,7 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <div style="width:100%;height:200px;background:#2e3037;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:13px;">No Poster</div>
             <?php endif; ?>
 
-            <div class="play" id="playTrailerBtn">
+            <div class="play" id="playTrailerBtn" data-url="<?php echo htmlspecialchars($trailerUrl ?? ''); ?>">
                 <i class="bi bi-play-fill"></i>
             </div>
 
@@ -220,10 +220,18 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
                 <span class="genre-badge"><?php echo $genre; ?></span>
             <?php endif; ?>
 
-            <div class="cont">
-                <?php if ($description): ?>
-                    <p class="movie-desc"><?php echo $description; ?></p>
-                <?php endif; ?>
+            <div class="cont" style="padding: 0 20px 20px; overflow-wrap: break-word; word-wrap: break-word; hyphens: auto; font-size: 0.8rem;">
+                <div style="color: rgba(255,255,255,0.7); line-height: 1.5;">
+                    <?php if (!empty($movie['director'])): ?>
+                        <div><strong>Director:</strong> <?php echo htmlspecialchars($movie['director']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['producer'])): ?>
+                        <div style="margin-top: 4px;"><strong>Producer:</strong> <?php echo htmlspecialchars($movie['producer']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['actors'])): ?>
+                        <div style="margin-top: 4px;"><strong>Cast:</strong> <?php echo htmlspecialchars($movie['actors']); ?></div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
@@ -231,14 +239,27 @@ $isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
         <div class="right" style="position:relative;">
 
             <!-- Background trailer video (muted, loops) -->
-            <?php if ($trailerUrl): ?>
-                <video src="../<?php echo $trailerUrl; ?>" id="bgVideo" autoplay muted loop playsinline></video>
+            <?php 
+            $isExternal = false;
+            $videoSrc = '';
+            if ($trailerUrl) {
+                if (strpos($trailerUrl, 'http://') === 0 || strpos($trailerUrl, 'https://') === 0) {
+                    $isExternal = true;
+                    $videoSrc = $trailerUrl; // For external, we won't use it as background video, we'll use backdrop
+                } else {
+                    $videoSrc = '../' . $trailerUrl;
+                }
+            }
+            ?>
+            
+            <?php if ($trailerUrl && !$isExternal): ?>
+                <video src="<?php echo $videoSrc; ?>" id="bgVideo" autoplay muted loop playsinline></video>
             <?php else: ?>
-                <!-- No trailer — use backdrop image as CSS bg via inline style -->
+                <!-- No local trailer — use backdrop image as CSS bg via inline style -->
                 <?php
                 $backdrop = htmlspecialchars($movie['backdrop_url'] ?? $movie['poster_url'] ?? '');
                 if ($backdrop): ?>
-                    <style>.book .right::before { background-image: url(../<?php echo $backdrop; ?>); }</style>
+                    <style>.book .right::before { background-image: url('../<?php echo $backdrop; ?>') !important; }</style>
                 <?php endif; ?>
             <?php endif; ?>
 

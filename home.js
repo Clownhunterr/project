@@ -2,21 +2,65 @@ let currentTrailer = "";
 
 function openTrailer() {
     if (!currentTrailer) return;
+    
     const overlay = document.getElementById('trailerOverlay');
     const video = document.getElementById('trailerVideo');
-    video.src = currentTrailer;
-    overlay.classList.add('active');
-    video.play();
+    const iframe = document.getElementById('trailerIframe');
+    
+    // Check if it's a YouTube URL
+    if (currentTrailer.includes('youtube.com') || currentTrailer.includes('youtu.be')) {
+        let videoId = "";
+        if (currentTrailer.includes('youtube.com/watch?v=')) {
+            videoId = currentTrailer.split('v=')[1].split('&')[0];
+        } else if (currentTrailer.includes('youtu.be/')) {
+            videoId = currentTrailer.split('youtu.be/')[1].split('?')[0];
+        }
+        
+        if (videoId && iframe && overlay) {
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            iframe.style.display = 'block';
+            if (video) video.style.display = 'none';
+            overlay.classList.add('active');
+            return;
+        }
+    }
+    
+    // Check if it's an external URL (http/https) that isn't YouTube
+    if (currentTrailer.startsWith('http://') || currentTrailer.startsWith('https://')) {
+        // Just open it in a new tab if it's not a direct video link
+        if (!currentTrailer.endsWith('.mp4') && !currentTrailer.endsWith('.webm')) {
+            window.open(currentTrailer, '_blank');
+            return;
+        }
+    }
+    
+    if (video && overlay) {
+        if (iframe) iframe.style.display = 'none';
+        video.style.display = 'block';
+        video.src = currentTrailer;
+        overlay.classList.add('active');
+        video.play();
+    }
 }
 
 function closeTrailer() {
     const overlay = document.getElementById('trailerOverlay');
     const video = document.getElementById('trailerVideo');
-    video.pause();
-    video.currentTime = 0;
-    video.removeAttribute('src');
-    video.load();
-    overlay.classList.remove('active');
+    const iframe = document.getElementById('trailerIframe');
+    
+    if (iframe) {
+        iframe.src = '';
+        iframe.style.display = 'none';
+    }
+    
+    if (video && overlay) {
+        video.pause();
+        video.currentTime = 0;
+        video.removeAttribute('src');
+        video.load();
+        video.style.display = 'none';
+    }
+    if (overlay) overlay.classList.remove('active');
 }
 
 function updateMovie(item) {
@@ -68,7 +112,7 @@ function toggleNotify(button) {
 
     const movieId = button.dataset.movieId;
 
-    fetch('wishlist_toggle.php', {
+    fetch('notify_toggle.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `movie_id=${encodeURIComponent(movieId)}`

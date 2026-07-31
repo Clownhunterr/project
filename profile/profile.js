@@ -19,3 +19,24 @@ document.addEventListener('DOMContentLoaded', function () {
         activateTab(requestedTab);
     }
 });
+
+function removeFromWishlist(movieId) {
+    if (!confirm("Remove this movie from your wishlist?")) return;
+    fetch('../wishlist_toggle.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `movie_id=${encodeURIComponent(movieId)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.message || 'Error removing item.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('An error occurred.');
+    });
+}

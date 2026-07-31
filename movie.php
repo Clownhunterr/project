@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'database/db.php';
 require 'includes/movie_functions.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
@@ -70,7 +70,8 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
 
     <div class="trailer" id="trailerOverlay">
         <div class="video-wrapper">
-            <video id="trailerVideo" controls></video>
+            <video id="trailerVideo" controls style="display:none;"></video>
+            <iframe id="trailerIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="display:none; width:100%; height:100%;"></iframe>
         </div>
     </div>
 
@@ -97,7 +98,28 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
                     <?php endif; ?>
                 </div>
 
-                <p class="movie-desc"><?php echo htmlspecialchars($movie['description']); ?></p>
+
+                
+                <div class="movie-crew" style="margin: 15px 0; font-size: 0.95rem; color: #ccc;">
+                    <?php if (!empty($movie['director'])): ?>
+                        <p style="margin-bottom: 5px;"><strong>Director:</strong> <?php echo htmlspecialchars($movie['director']); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['producer'])): ?>
+                        <p style="margin-bottom: 5px;"><strong>Producer:</strong> <?php echo htmlspecialchars($movie['producer']); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['actors'])): ?>
+                        <p style="margin-bottom: 5px;"><strong>Cast:</strong> <?php echo htmlspecialchars($movie['actors']); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($movie['ticket_start_date']) || !empty($movie['ticket_end_date'])): ?>
+                        <p style="margin-top: 10px; color: var(--primary);">
+                            <i class="fa-solid fa-calendar-alt"></i> 
+                            Tickets Available: 
+                            <?php echo $movie['ticket_start_date'] ? date('M j, Y', strtotime($movie['ticket_start_date'])) : 'Now'; ?> 
+                            - 
+                            <?php echo $movie['ticket_end_date'] ? date('M j, Y', strtotime($movie['ticket_end_date'])) : 'Until closed'; ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
 
                 <div class="movie-actions">
                     <?php if (!empty($movie['trailer_url'])): ?>
@@ -164,24 +186,65 @@ $backdrop = $movie['backdrop_url'] ?: $movie['poster_url'];
         function playTrailer(src) {
             const overlay = document.getElementById('trailerOverlay');
             const video = document.getElementById('trailerVideo');
-            video.src = src;
-            overlay.classList.add('active');
-            video.play();
+            const iframe = document.getElementById('trailerIframe');
+            
+            // Check if it's a YouTube URL
+            if (src.includes('youtube.com') || src.includes('youtu.be')) {
+                let videoId = "";
+                if (src.includes('youtube.com/watch?v=')) {
+                    videoId = src.split('v=')[1].split('&')[0];
+                } else if (src.includes('youtu.be/')) {
+                    videoId = src.split('youtu.be/')[1].split('?')[0];
+                }
+                
+                if (videoId && iframe && overlay) {
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    iframe.style.display = 'block';
+                    if (video) video.style.display = 'none';
+                    overlay.classList.add('active');
+                    return;
+                }
+            }
+            
+            if (src.startsWith('http://') || src.startsWith('https://')) {
+                if (!src.endsWith('.mp4') && !src.endsWith('.webm')) {
+                    window.open(src, '_blank');
+                    return;
+                }
+            }
+            
+            if (video && overlay) {
+                if (iframe) iframe.style.display = 'none';
+                video.style.display = 'block';
+                video.src = src;
+                overlay.classList.add('active');
+                video.play();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {
             const trailerOverlay = document.getElementById('trailerOverlay');
-            trailerOverlay.addEventListener('click', function () {
-                const video = document.getElementById('trailerVideo');
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
-                trailerOverlay.classList.remove('active');
-            });
-            document.querySelector('.video-wrapper').addEventListener('click', e => e.stopPropagation());
+            if (trailerOverlay) {
+                trailerOverlay.addEventListener('click', function () {
+                    const video = document.getElementById('trailerVideo');
+                    const iframe = document.getElementById('trailerIframe');
+                    if (iframe) {
+                        iframe.src = '';
+                        iframe.style.display = 'none';
+                    }
+                    if (video) {
+                        video.pause();
+                        video.removeAttribute('src');
+                        video.load();
+                        video.style.display = 'none';
+                    }
+                    trailerOverlay.classList.remove('active');
+                });
+            }
+            document.querySelector('.video-wrapper')?.addEventListener('click', e => e.stopPropagation());
         });
     </script>
-    <script src="home.js"></script>
+    <script src="home.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

@@ -56,9 +56,9 @@ $movies = $pdo->query("SELECT * FROM movies ORDER BY movie_id DESC")->fetchAll()
                         <tr>
                             <th>Poster</th>
                             <th>Title</th>
-                            <th>Genre</th>
-                            <th>Duration</th>
-                            <th>Release Date</th>
+                            <th>Genre & Duration</th>
+                            <th>Director & Producer</th>
+                            <th>Release / Tickets</th>
                             <th>Status</th>
                             <th>Carousel</th>
                             <th>Actions</th>
@@ -74,10 +74,21 @@ $movies = $pdo->query("SELECT * FROM movies ORDER BY movie_id DESC")->fetchAll()
                                         &mdash;
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo htmlspecialchars($movie['title']); ?></td>
-                                <td><?php echo htmlspecialchars($movie['genre']); ?></td>
-                                <td><?php echo (int) $movie['duration_minutes']; ?> min</td>
-                                <td><?php echo $movie['release_date'] ? date('M j, Y', strtotime($movie['release_date'])) : '—'; ?>
+                                <td>
+                                    <strong><?php echo htmlspecialchars($movie['title']); ?></strong><br>
+                                    <small><?php echo htmlspecialchars($movie['actors']); ?></small>
+                                </td>
+                                <td>
+                                    <?php echo htmlspecialchars($movie['genre']); ?><br>
+                                    <small><?php echo (int) $movie['duration_minutes']; ?> min</small>
+                                </td>
+                                <td>
+                                    <?php echo htmlspecialchars($movie['director'] ?: '—'); ?><br>
+                                    <small><?php echo htmlspecialchars($movie['producer'] ?: '—'); ?></small>
+                                </td>
+                                <td>
+                                    Rel: <?php echo $movie['release_date'] ? date('M j, Y', strtotime($movie['release_date'])) : '—'; ?><br>
+                                    <small>Tkt: <?php echo $movie['ticket_start_date'] ? date('M j', strtotime($movie['ticket_start_date'])) : '—'; ?> - <?php echo $movie['ticket_end_date'] ? date('M j', strtotime($movie['ticket_end_date'])) : '—'; ?></small>
                                 </td>
                                 <td>
                                     <?php echo $movie['status'] === 'now_showing' ? 'Now Showing' : 'Coming Soon'; ?>

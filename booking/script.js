@@ -95,15 +95,25 @@ document.addEventListener('DOMContentLoaded', () => {
     posterVideo.style.display = 'none';
   }
 
-  if (playBtn && posterVideo && posterImg) {
+  if (playBtn) {
     playBtn.addEventListener('click', () => {
-      if (posterVideo.paused) {
-        posterVideo.play();
-      } else {
-        posterVideo.pause();
+      const url = playBtn.dataset.url || '';
+      if (url && (url.includes('youtube.com') || url.includes('youtu.be') || url.startsWith('http'))) {
+          window.open(url, '_blank');
+          return;
+      }
+      
+      if (posterVideo) {
+        if (posterVideo.paused) {
+          posterVideo.play();
+        } else {
+          posterVideo.pause();
+        }
       }
     });
+  }
 
+  if (posterVideo && posterImg && playBtn) {
     posterVideo.addEventListener('play', () => {
       posterImg.style.display = 'none';
       posterVideo.style.display = 'block';

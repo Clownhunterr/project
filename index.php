@@ -101,7 +101,8 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
 
     <div class="trailer" id="trailerOverlay">
         <div class="video-wrapper">
-            <video id="trailerVideo" controls></video>
+            <video id="trailerVideo" controls style="display:none;"></video>
+            <iframe id="trailerIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="display:none; width:100%; height:100%;"></iframe>
         </div>
     </div>
 
@@ -155,7 +156,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                         <?php foreach ($carouselMovies as $movie):
                             $titleImg = $movie['title_img'] ?? $movie['poster_url'];
                             ?>
-                            <div class="carousel-item" data-movie-id="<?php echo (int) $movie['movie_id']; ?>"
+                                <div class="carousel-item" data-movie-id="<?php echo (int) $movie['movie_id']; ?>"
                                 data-bg="<?php echo htmlspecialchars($movie['backdrop_url'] ?: $movie['poster_url']); ?>"
                                 data-title-img="<?php echo htmlspecialchars($titleImg); ?>"
                                 data-year="<?php echo $movie['release_date'] ? date('Y', strtotime($movie['release_date'])) : ''; ?>"
@@ -163,6 +164,9 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                                 data-duration="<?php echo formatDuration($movie['duration_minutes']); ?>"
                                 data-genre="<?php echo htmlspecialchars($movie['genre']); ?>"
                                 data-desc="<?php echo htmlspecialchars($movie['description']); ?>"
+                                data-director="<?php echo htmlspecialchars($movie['director'] ?? ''); ?>"
+                                data-producer="<?php echo htmlspecialchars($movie['producer'] ?? ''); ?>"
+                                data-actors="<?php echo htmlspecialchars($movie['actors'] ?? ''); ?>"
                                 data-trailer="<?php echo htmlspecialchars($movie['trailer_url']); ?>"
                                 data-status="<?php echo htmlspecialchars($movie['status']); ?>">
                                 <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
@@ -261,7 +265,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
     <script>
         const CINEBOOKING_LOGGED_IN = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
     </script>
-    <script src="home.js"></script>
+    <script src="home.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
