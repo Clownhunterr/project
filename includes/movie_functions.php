@@ -25,8 +25,8 @@ function getFallbackMovies()
             'age_rating' => '15+',
             'duration_minutes' => 96,
             'description' => 'Twenty-six years after outrunning a suspiciously familiar masked killer, the Core Four are back in the killer\'s crosshairs and no horror movie IP is safe.',
-            'poster_url' => 'img/scaryMovieposter.jpg',
-            'backdrop_url' => 'img/scaryMoviebackdrop.jpg',
+            'poster_url' => 'img/scaryMoviePoster.jpg',
+            'backdrop_url' => 'img/scaryMovieBackdrop.jpg',
             'title_img' => 'img/scaryMovieTitle.jpg',
             'trailer_url' => '',
             'release_date' => '2023-01-01',
@@ -187,7 +187,7 @@ function getCarouselMovies(PDO $pdo, $limit = 5)
         $padLimit = $limit - count($rows);
         $excludeIds = empty($rows) ? [0] : array_column($rows, 'movie_id');
         $inClause = implode(',', array_map('intval', $excludeIds));
-        
+
         try {
             $padSql = "SELECT * FROM movies WHERE status = 'now_showing' AND movie_id NOT IN ($inClause) ORDER BY release_date DESC LIMIT $padLimit";
             $padRows = $pdo->query($padSql)->fetchAll();
