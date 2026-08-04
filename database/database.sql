@@ -60,15 +60,15 @@ ON DUPLICATE KEY UPDATE
 -- Movies
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies (
-    movie_id         INT AUTO_INCREMENT PRIMARY KEY,
-    title             VARCHAR(150) NOT NULL,
-    genre             VARCHAR(50),
-    duration_minutes  INT,
-    description       TEXT,
-    poster_image      VARCHAR(255),
-    release_year      YEAR,
-    age_rating        VARCHAR(10),
-    created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    movie_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    genre VARCHAR(50),
+    duration_minutes INT,
+    description TEXT,
+    poster_image VARCHAR(255),
+    release_year YEAR,
+    age_rating VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ---------------------------------------------------------------------
@@ -152,4 +152,16 @@ CREATE TABLE IF NOT EXISTS wishlist (
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     FOREIGN KEY (movie_id) REFERENCES movies (movie_id) ON DELETE CASCADE,
     UNIQUE KEY unique_wish (user_id, movie_id)
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    movie_id INT NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    is_read TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (movie_id) REFERENCES movies (movie_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_notify (user_id, movie_id)
 );

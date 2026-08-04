@@ -283,3 +283,14 @@ function getUserWishlistIds(PDO $pdo, $userId)
         return [];
     }
 }
+
+function getUserNotifiedIds(PDO $pdo, $userId)
+{
+    try {
+        $stmt = $pdo->prepare("SELECT movie_id FROM notifications WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        return array_column($stmt->fetchAll(), 'movie_id');
+    } catch (PDOException $e) {
+        return [];
+    }
+}

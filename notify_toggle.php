@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Please log in to manage notifications.']);
+    echo json_encode(['success' => false, 'message' => 'Please log in to get notified.']);
     exit;
 }
 
@@ -18,24 +18,20 @@ if ($movieId <= 0) {
     exit;
 }
 
-try {
-    // Check if notification request exists (using the notifications table as a subscription placeholder, 
-    // or we use wishlist as subscription. Let's just create a generic 'notification' record if not exists)
-    $stmt = $pdo->prepare("SELECT notification_id FROM notifications WHERE user_id = ? AND movie_id = ? AND is_read = 0");
-    $stmt->execute([$userId, $movieId]);
-    $existing = $stmt->fetch();
+$stmt = $pdo->prepare("SELECT notification_id FROM notifications WHERE user_id = ? AND movie_id = ?");
+$stmt->execute([$userId, $movieId]);
+$existing = $stmt->fetch();
 
-    if ($existing) {
-        $stmt = $pdo->prepare("DELETE FROM notifications WHERE notification_id = ?");
-        $stmt->execute([$existing['notification_id']]);
-        echo json_encode(['success' => true, 'inWishlist' => false]);
-    } else {
-        $msg = "You are now subscribed to notifications for this movie!";
-        $title = "Movie Notification";
-        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, movie_id, title, message) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$userId, $movieId, $title, $msg]);
-        echo json_encode(['success' => true, 'inWishlist' => true]);
-    }
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'An error occurred.']);
+if ($existing) {
+    $stmt = $pdo->prepare("DELETE FROM notifications WHERE notification_id = ?");
+    $stmt->execute([$existing['notification_id']]);
+    echo json_encode(['success' => true, 'inWishlist' => false]);
+} else {
+    $stmt = $pdo->prepare("SELECT title FROM movies WHERE movie_id = ?");
+    $stmt->execute([$movieId]);
+    $title = $stmt->fetchColumn() ?: 'This movie';
+
+    $stmt = $pdo->prepare("INSERT INTO notifications (user_id, movie_id, message) VALUES (?, ?, ?)");
+    $stmt->execute([$userId, $movieId, "$title is coming soon — we'll notify you closer to release."]);
+    echo json_encode(['success' => true, 'inWishlist' => true]);
 }

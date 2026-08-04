@@ -5,6 +5,7 @@ require 'includes/movie_functions.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
 $wishlistIds = $isLoggedIn ? getUserWishlistIds($pdo, $_SESSION['user_id']) : [];
+$notifiedIds = $isLoggedIn ? getUserNotifiedIds($pdo, $_SESSION['user_id']) : [];
 
 $searchQuery = trim($_GET['search'] ?? '');
 $searchResults = [];
@@ -31,10 +32,11 @@ function formatDuration($minutes)
     return "{$m}min";
 }
 
-function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticket')
+function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticket', $notifiedIds = [])
 {
     $isFallback = !empty($movie['is_fallback']);
     $inWishlist = !$isFallback && in_array($movie['movie_id'], $wishlistIds);
+    $isNotified = !$isFallback && in_array($movie['movie_id'], $notifiedIds);
     $poster = $movie['poster_url'] ?: 'img/placeholder-poster.jpg';
     $isNotify = $buttonLabel === 'Notify Me';
     ?>
@@ -51,14 +53,15 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
             </p>
             <?php if ($isNotify && $isLoggedIn && !$isFallback): ?>
-                <button type="button" class="btn-notify notify-toggle <?php echo $inWishlist ? 'notified' : ''; ?>"
+                <button type="button" class="btn-notify notify-toggle <?php echo $isNotified ? 'notified' : ''; ?>"
                     data-movie-id="<?php echo (int) $movie['movie_id']; ?>" onclick="toggleNotify(this)">
-                    <?php echo $inWishlist ? 'Notified ✓' : 'Notify Me'; ?>
+                    <?php echo $isNotified ? 'Notified ✓' : 'Notify Me'; ?>
                 </button>
             <?php elseif ($isNotify): ?>
                 <a href="login/login.php" class="btn-notify"><?php echo htmlspecialchars($buttonLabel); ?></a>
             <?php else: ?>
-                <a href="booking/booking.php?id=<?php echo (int)$movie['movie_id']; ?>" class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
+                <a href="booking/booking.php?id=<?php echo (int) $movie['movie_id']; ?>"
+                    class="btn-book"><?php echo htmlspecialchars($buttonLabel); ?></a>
             <?php endif; ?>
         </div>
     </div>
@@ -102,7 +105,8 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
     <div class="trailer" id="trailerOverlay">
         <div class="video-wrapper">
             <video id="trailerVideo" controls style="display:none;"></video>
-            <iframe id="trailerIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="display:none; width:100%; height:100%;"></iframe>
+            <iframe id="trailerIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+                style="display:none; width:100%; height:100%;"></iframe>
         </div>
     </div>
 
@@ -156,7 +160,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                         <?php foreach ($carouselMovies as $movie):
                             $titleImg = $movie['title_img'] ?? $movie['poster_url'];
                             ?>
-                                <div class="carousel-item" data-movie-id="<?php echo (int) $movie['movie_id']; ?>"
+                            <div class="carousel-item" data-movie-id="<?php echo (int) $movie['movie_id']; ?>"
                                 data-bg="<?php echo htmlspecialchars($movie['backdrop_url'] ?: $movie['poster_url']); ?>"
                                 data-title-img="<?php echo htmlspecialchars($titleImg); ?>"
                                 data-year="<?php echo $movie['release_date'] ? date('Y', strtotime($movie['release_date'])) : ''; ?>"
@@ -193,7 +197,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
             <h2 class="section-title">Coming Soon</h2>
             <div class="movie-grid">
                 <?php foreach ($comingSoon as $movie): ?>
-                    <?php movieCard($movie, $wishlistIds, $isLoggedIn, 'Notify Me'); ?>
+                    <?php movieCard($movie, $wishlistIds, $isLoggedIn, 'Notify Me', $notifiedIds); ?>
                 <?php endforeach; ?>
             </div>
         </section>
@@ -221,7 +225,8 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
                             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
                             </p>
-                            <a href="booking/booking.php?id=<?php echo (int)$movie['movie_id']; ?>" class="btn-book">Book Ticket</a>
+                            <a href="booking/booking.php?id=<?php echo (int) $movie['movie_id']; ?>" class="btn-book">Book
+                                Ticket</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
