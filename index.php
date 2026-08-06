@@ -4,7 +4,6 @@ require 'database/db.php';
 require 'includes/movie_functions.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
-var_dump($_SESSION);
 $wishlistIds = $isLoggedIn ? getUserWishlistIds($pdo, $_SESSION['user_id']) : [];
 $notifiedIds = $isLoggedIn ? getUserNotifiedIds($pdo, $_SESSION['user_id']) : [];
 
@@ -48,7 +47,8 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                 <i class="<?php echo $inWishlist ? 'fa-solid' : 'fa-regular'; ?> fa-heart"></i>
             </button>
         <?php endif; ?>
-        <img src="<?php echo htmlspecialchars($poster); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>" />
+        <img src="<?php echo htmlspecialchars($poster); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>"
+            loading="lazy" />
         <div class="movie-info">
             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
@@ -175,7 +175,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                                 data-trailer="<?php echo htmlspecialchars($movie['trailer_url']); ?>"
                                 data-status="<?php echo htmlspecialchars($movie['status']); ?>">
                                 <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
-                                    alt="<?php echo htmlspecialchars($movie['title']); ?>" />
+                                    alt="<?php echo htmlspecialchars($movie['title']); ?>" loading="lazy" />
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -221,7 +221,7 @@ function movieCard($movie, $wishlistIds, $isLoggedIn, $buttonLabel = 'Book Ticke
                             </button>
                         <?php endif; ?>
                         <img src="<?php echo htmlspecialchars($movie['poster_url'] ?: 'img/placeholder-poster.jpg'); ?>"
-                            alt="<?php echo htmlspecialchars($movie['title']); ?>" />
+                            alt="<?php echo htmlspecialchars($movie['title']); ?>" loading="lazy" />
                         <div class="movie-info">
                             <h3><?php echo htmlspecialchars($movie['title']); ?></h3>
                             <p><?php echo htmlspecialchars($movie['genre']); ?><?php echo $movie['duration_minutes'] ? ' • ' . formatDuration($movie['duration_minutes']) : ''; ?>
