@@ -69,7 +69,7 @@ function getFallbackMovies()
             'genre' => 'Science Fiction, Action and Adventure',
             'age_rating' => '12+',
             'duration_minutes' => 145,
-            'description' => 'Fighting crime full-time as Spider-Man in a world that doesn\'t remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter Parker he may not have the power to control. But that transformation might also be the only thing that can stop a shocking new threat to the city and those he loves - a powerful villain no one can even see.',
+            'description' => 'Fighting crime full-time as Spider-Man in a world that doesn\'t remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter Parker he may not have the power to control.',
             'poster_url' => 'img/BrandNewDayPoster.jpg',
             'backdrop_url' => 'img/BrandNewDayBackdrop.jpg',
             'title_img' => 'img/BrandNewDayTitle.jpg',

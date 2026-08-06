@@ -4,6 +4,7 @@ require 'database/db.php';
 require 'includes/movie_functions.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
+var_dump($_SESSION);
 $wishlistIds = $isLoggedIn ? getUserWishlistIds($pdo, $_SESSION['user_id']) : [];
 $notifiedIds = $isLoggedIn ? getUserNotifiedIds($pdo, $_SESSION['user_id']) : [];
 
